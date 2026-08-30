@@ -9,11 +9,10 @@
 - Halte Ordnung: Ein neuer Harness-Baustein (Skript, Subagent, Skill, MCP-Eintrag) bekommt sofort seinen Satz in `AGENTS.md` – ein unbekannter Baustein existiert für den Agenten nicht.
 
 ## Schritt 0 – Sprache
-Dieses Template liegt in Deutsch (Wurzel), Englisch und Chinesisch (`i18n/en/`, `i18n/zh-CN/`) vor. Frage, in welcher Sprache Harness-Dateien (`AGENTS.md`, Subagenten, dieser Skill, Wiki-Skelett) geführt werden sollen.
-- Deutsch: nichts kopieren.
-- Englisch/Chinesisch: die Dateien aus `i18n/<sprache>/` an dieselben Pfade in der Projektwurzel kopieren (überschreiben), danach `python3 tools/sync-agents.py` ausführen.
-- In jedem Fall am Ende der Einrichtung `i18n/` löschen. Die Skripte in `tools/` sprechen Englisch (Quellcode-Sprache) – das bleibt so.
-- Notiere unter „Projekt" die Sprache für Antworten, Dokumentation und Kommentare.
+Die Harness-Dateien (`AGENTS.md`, Subagenten, dieser Skill, Wiki-Skelett) sind auf Deutsch geschrieben – Agenten lesen das unabhängig von der Projektsprache; nur die READMEs des Templates sind dreisprachig, weil Menschen sie lesen.
+- Frage, in welcher Sprache der Benutzer mit dem Agenten arbeitet und in welcher Sprache Dokumentation und Kommentare des Projekts geführt werden; notiere das unter „Projekt".
+- Wünscht der Benutzer die Harness-Dateien in seiner Sprache, übersetze sie jetzt einmalig an Ort und Stelle (Struktur, Pfade, Befehle, Protokollwörter wie `NICHT IM WIKI`/`PASS`/`NEEDS_WORK` konsistent halten), danach `python3 tools/sync-agents.py` ausführen. Es gibt bewusst nur EINE Fassung – keine Sprachspiegel, kein Sync-Aufwand.
+- Die Skripte in `tools/` sprechen Englisch (Quellcode-Sprache) – das bleibt so.
 
 ## Schritt 1 – Das Projekt kennenlernen
 Sieh dich um (Repo-Struktur, Build-System, vorhandene Regeldateien, `docs/`, Tests, CI) und frage nach, was du nicht sehen kannst:
@@ -90,14 +89,14 @@ Lies [workflow.md](workflow.md). Lege mit dem Benutzer den Standard-Workflow fes
 
 ## Schritt 10 – Abschluss
 1. `AGENTS.md` aufräumen: alle Platzhalter-Kommentare durch Inhalt ersetzt oder entfernt; **den Absatz „Harness einrichten" löschen**; den Satz zum Harness-Skill an das Ergebnis von Schritt 2 anpassen (Rückfallebene nur, wenn ein Agent keine Skills kennt); Länge prüfen – Kernregeln kurz, Details verlinkt; jede Regel mit Begründung, keine Romane.
-2. `i18n/` löschen. Die READMEs des Templates (`README.md`, `README.de.md`, `README.zh-CN.md`) durch die README des Projekts ersetzen oder löschen; `LICENSE` des Templates entfernen oder – wenn das Projekt veröffentlicht wird – die Attribution daraus in die eigene Lizenzdatei/README übernehmen (CC BY 4.0).
+2. Die READMEs des Templates (`README.md`, `README.de.md`, `README.zh-CN.md`) durch die README des Projekts ersetzen oder löschen; `LICENSE` des Templates entfernen oder – wenn das Projekt veröffentlicht wird – die Attribution daraus in die eigene Lizenzdatei/README übernehmen (CC BY 4.0).
 3. `python3 tools/sync-agents.py`, `python3 tools/agent-start.py doctor`, Kontext-Ansicht des Agenten prüfen (Regeldateien geladen? unerwartete Kosten?).
 4. Diesen Skill nachziehen, falls die Einrichtung etwas Projektspezifisches am Harness ergeben hat (neue Skripte, eigene Evaluatoren): betroffenes Dokument + `index.md`.
 5. **evaluator** aufrufen: Aufgabe „Harness-Einrichtung", Kriterien = Checkliste unten, Evidenz = `AGENTS.md`, angelegte Dateien, Ausgaben der Skripte. Bis `PASS`.
 6. Bei Wiki: Entscheidungen samt Begründung über den librarian einlagern. Offene Punkte dem Benutzer als Liste nennen. Committen, wenn der Benutzer es wünscht.
 
 ## Checkliste (Kriterien für den evaluator)
-- [ ] Sprache festgelegt; `i18n/` entfernt; Template-READMEs ersetzt oder entfernt
+- [ ] Sprache festgelegt (Harness-Dateien ggf. einmalig übersetzt); Template-READMEs ersetzt oder entfernt
 - [ ] `AGENTS.md`: Projekt, Sprache, Fallstricke, Coding-Agenten (je ein Satz), Wissensablage-Regeln, Werkzeuge/Skripte, Architektur-Kernregeln, Qualitätssicherung (Evaluatoren + wann), Standard-Workflow – keine Platzhalter mehr, Einrichtungs-Absatz gelöscht
 - [ ] `CLAUDE.md` = `@AGENTS.md`; Regel für Unterordner steht; Unterordner-Regeldateien (falls gewählt) haben beide Dateien
 - [ ] Subagenten in allen benötigten Formaten (`sync-agents.py` gelaufen); nicht benötigte Subagenten entfernt

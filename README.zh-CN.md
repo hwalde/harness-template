@@ -23,7 +23,6 @@ CLAUDE.md                  仅包含 "@AGENTS.md"
 .my-memory/                空的 LLM wiki——只能通过 librarian 访问
 tools/agent-start.py       启动、连接、结束"永不提问"的运行（tmux/psmux）
 tools/sync-agents.py       将子智能体定义转换为其他格式
-i18n/en, i18n/zh-CN        英文与中文版本的 harness 文件
 ```
 
 **evaluator** —— 以全新上下文、无写入权限，对照规格、diff 和证据进行检查；回答 `PASS` 或 `NEEDS_WORK`。可选指定侧重点（安全、性能、整洁代码、编码规范、架构）。
@@ -44,7 +43,7 @@ Claude Code 开箱即用。opencode 的子智能体由脚本生成。其他所�
 
 ## 语言
 
-harness 文件（`AGENTS.md`、子智能体、技能、wiki 骨架）的德文版位于根目录，英文与中文版位于 `i18n/` 下。安装的第 0 步选择语言并删除其余版本。`tools/` 中的脚本使用英文（源代码语言）。
+只有供人阅读的内容才是三语的：这三份 README（英/中/德）。harness 文件本身（`AGENTS.md`、子智能体、技能）只有一份德文版——编码智能体不受语言限制都能读懂，而且单一版本意味着没有翻译同步负担。如果你更希望它们使用你的语言：安装的第 0 步可以让你的智能体一次性完成翻译。`tools/` 中的脚本使用英文（源代码语言）。
 
 ## freilauf：上层框架
 
@@ -54,7 +53,7 @@ harness 文件（`AGENTS.md`、子智能体、技能、wiki 骨架）的德文�
 
 欢迎提交 Pull Request——改进文档与子智能体、为 `sync-agents.py` 增加目标格式、翻译。基本规则：
 
-- 三份 README **一同**维护；根目录与 `i18n/` 下的 harness 文件亦然。
+- 三份 README **一同**维护。
 - 每个含有 `AGENTS.md` 的目录旁都有一个只包含 `@AGENTS.md` 的 `CLAUDE.md`。
 - 脚本遵循 `.claude/skills/harness/skripte.md`；源代码语言为英文。
 - 仓库中不得包含任何机器特定信息或密钥。

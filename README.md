@@ -23,7 +23,6 @@ CLAUDE.md                  Contains only "@AGENTS.md"
 .my-memory/                Empty LLM wiki – accessed only through the librarian
 tools/agent-start.py       Start, attach to and end runs that never ask (tmux/psmux)
 tools/sync-agents.py       Translate subagent definitions into other formats
-i18n/en, i18n/zh-CN        The harness files in English and Chinese
 ```
 
 **evaluator** – checks with a fresh context and no write access against specification, diff and evidence; answers `PASS` or `NEEDS_WORK`. Optionally with a focus (security, performance, clean code, guidelines, architecture).
@@ -44,7 +43,7 @@ Claude Code works out of the box. For opencode the subagents are generated. All 
 
 ## Languages
 
-The harness files (`AGENTS.md`, subagents, skill, wiki skeleton) live in German in the root and in English and Chinese under `i18n/`. Step 0 of the setup picks the language and removes the rest. The scripts in `tools/` speak English (source-code language).
+Only what humans read is trilingual: these READMEs (EN/ZH/DE). The harness files themselves (`AGENTS.md`, subagents, skill) exist in a single German edition – coding agents read them regardless of your language, and a single edition means no translation sync. If you would rather have them in your language: step 0 of the setup lets your agent translate them once. The scripts in `tools/` speak English (source-code language).
 
 ## freilauf: the superstructure
 
@@ -54,7 +53,7 @@ This template is the starter *inside* the project. [freilauf](https://github.com
 
 Pull requests are welcome – improvements to documents and subagents, further target formats for `sync-agents.py`, translations. Ground rules:
 
-- The three READMEs are maintained **together**; so are the harness files in the root and under `i18n/`.
+- The three READMEs are maintained **together**.
 - Every directory with an `AGENTS.md` has a `CLAUDE.md` next to it containing only `@AGENTS.md`.
 - Scripts follow `.claude/skills/harness/skripte.md`; the source-code language is English.
 - Nothing machine-specific and no secrets in the repository.

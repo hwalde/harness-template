@@ -23,7 +23,6 @@ CLAUDE.md                  Enthält nur „@AGENTS.md"
 .my-memory/                Leeres LLM-Wiki – nur über den librarian
 tools/agent-start.py       Rückfragefreie Läufe starten, anhängen, beenden (tmux/psmux)
 tools/sync-agents.py       Subagenten-Definitionen in andere Formate übersetzen
-i18n/en, i18n/zh-CN        Die Harness-Dateien auf Englisch und Chinesisch
 ```
 
 **evaluator** – prüft mit frischem Kontext und ohne Schreibrechte gegen Spezifikation, Diff und Evidenz; antwortet `PASS` oder `NEEDS_WORK`. Optional mit Schwerpunkt (Sicherheit, Performance, Clean Code, Guidelines, Architektur).
@@ -44,7 +43,7 @@ Claude Code läuft out of the box. Für opencode werden die Subagenten generiert
 
 ## Sprachen
 
-Die Harness-Dateien (`AGENTS.md`, Subagenten, Skill, Wiki-Skelett) liegen auf Deutsch in der Wurzel und auf Englisch und Chinesisch unter `i18n/`. Schritt 0 der Einrichtung wählt die Sprache und entfernt den Rest. Die Skripte in `tools/` sprechen Englisch (Quellcode-Sprache).
+Nur was Menschen lesen, ist dreisprachig: diese READMEs (EN/ZH/DE). Die Harness-Dateien selbst (`AGENTS.md`, Subagenten, Skill) liegen in einer Fassung auf Deutsch – Coding-Agenten lesen sie unabhängig von deiner Sprache, und eine einzige Fassung bedeutet keinen Übersetzungs-Sync. Wer sie lieber in der eigenen Sprache hätte: Schritt 0 der Einrichtung lässt den Agenten sie einmalig übersetzen. Die Skripte in `tools/` sprechen Englisch (Quellcode-Sprache).
 
 ## freilauf: der Überbau
 
@@ -54,7 +53,7 @@ Dieses Template ist der Starter *im* Projekt. [freilauf](https://github.com/hwal
 
 Pull Requests sind willkommen – Verbesserungen an Dokumenten und Subagenten, weitere Zielformate für `sync-agents.py`, Übersetzungen. Spielregeln:
 
-- Die drei READMEs werden **gemeinsam** gepflegt; ebenso die Harness-Dateien in der Wurzel und unter `i18n/`.
+- Die drei READMEs werden **gemeinsam** gepflegt.
 - Jeder Ordner mit einer `AGENTS.md` hat eine `CLAUDE.md` daneben, die nur `@AGENTS.md` enthält.
 - Skripte folgen `.claude/skills/harness/skripte.md`; Quellcode-Sprache ist Englisch.
 - Nichts Maschinenspezifisches und keine Secrets im Repository.

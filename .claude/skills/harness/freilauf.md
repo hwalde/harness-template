@@ -1,27 +1,27 @@
-# freilauf: Agenten laufen und überwachen lassen
-**Kern:** Dieses Template ist der Projekt-Starter (was im Repo liegt). freilauf ist der Überbau darüber: eine selbst gehostete Weboberfläche, die ein stehendes Team von Coding-Agenten nach Zeitplan laufen lässt und von außen überwacht. (Kontext: Harness-Template | Stand: 2026-08-30 | Quelle: https://github.com/hwalde/freilauf)
+# freilauf: letting agents run and monitoring them
+**Core:** This template is the project starter (what lives in the repo). freilauf is the superstructure above it: a self-hosted web interface that runs a standing team of coding agents on schedules and monitors them from outside. (Context: harness template | As of: 2026-08-30 | Source: https://github.com/hwalde/freilauf)
 
-## Was freilauf tut
-- **Läufe ohne Aufsicht:** Jeder Lauf bekommt einen eigenen Git-Worktree und eine eigene tmux-Session; Läufe stören sich nicht, man kann sich jederzeit anhängen und den ganzen Bildschirm lesen.
-- **Zeitpläne:** „Jede Nacht um 2 die offenen Issues ansehen." Ein *Agent* ist eine gespeicherte Lauf-Definition (Coding-Agent, Modell, Reasoning-Aufwand, Prompt, Repo, Branch-Regel) plus Name und Zeitplan; ein *Einzellauf* dasselbe ohne Zeitplan.
-- **Beobachtung von außen:** tmux-Zustand, Logs, Transkripte, Hooks, Provider-Puls – Rate-Limits und Ausfälle werden erkannt, auch wenn der Agent selbst nichts mehr melden kann.
-- **Fertig heißt auf `main`:** Optional merged der Hub selbst, prüft die Behauptung des Agenten vor dem Glauben (Finish Gate) und schickt den noch lebenden Agenten zurück, um Fehlendes nachzuholen.
-- **Budget-Gates:** Geplante Starts warten, wenn Abo-Kontingent oder Guthaben knapp sind.
-- **Reports** des Agenten (`cc-report done|failed|help|progress|branch|pr`), **Telegram-Benachrichtigungen**, **No-Code-Flows** (was nach einem Lauf passiert: Folgeläufe, Nachrichten an laufende Agenten, Extraktion aus Reports, Verzweigungen).
-- **Coding-Agenten und Modell-Provider als Plugins:** Claude Code, opencode, hermes, cursor-agent u. a.; weitere per Plugin-Paket. Oberfläche in Englisch, Deutsch und Chinesisch.
-- Enthält die Start-/Anhänge-Skripte (`cc-start`, `cc-attach`, `cc-kill`, `cc-report`), von denen `tools/agent-start.py` in diesem Template die projektlokale Kleinfassung ist.
+## What freilauf does
+- **Runs without supervision:** every run gets its own Git worktree and its own tmux session; runs do not disturb each other, you can attach at any time and read the whole screen.
+- **Schedules:** "Every night at 2, look at the open issues." An *agent* is a saved run definition (coding agent, model, reasoning effort, prompt, repo, branch rule) plus a name and a schedule; a *single run* is the same without a schedule.
+- **Observation from outside:** tmux state, logs, transcripts, hooks, provider pulse – rate limits and outages are detected even when the agent itself can no longer report anything.
+- **Done means on `main`:** optionally the hub merges itself, checks the agent's claim before believing it (finish gate), and sends the still-living agent back to catch up on what is missing.
+- **Budget gates:** scheduled starts wait when subscription quota or credit is running low.
+- **Reports** from the agent (`cc-report done|failed|help|progress|branch|pr`), **Telegram notifications**, **no-code flows** (what happens after a run: follow-up runs, messages to running agents, extraction from reports, branching).
+- **Coding agents and model providers as plugins:** Claude Code, opencode, hermes, cursor-agent, and others; more via plugin package. The interface in English, German, and Chinese.
+- Contains the start/attach scripts (`cc-start`, `cc-attach`, `cc-kill`, `cc-report`), of which `tools/agent-start.py` in this template is the project-local small edition.
 
-## Wann es sich lohnt
-- Sobald Läufe regelmäßig **unbeaufsichtigt** oder **nach Zeitplan** laufen sollen (Nachtläufe, wiederkehrende Wartung, Issue-Abarbeitung).
-- Sobald mehrere Agenten oder mehrere Repos parallel laufen und man wissen will, wann etwas schiefging – ohne selbst dauernd hinzuschauen.
-- Sobald das Ergebnis eines Laufs verlässlich auf dem Hauptbranch landen soll, mit Prüfung vor dem Merge.
+## When it pays off
+- As soon as runs are to happen regularly **unattended** or **on a schedule** (night runs, recurring maintenance, working through issues).
+- As soon as several agents or several repos run in parallel and you want to know when something went wrong – without constantly looking yourself.
+- As soon as the result of a run should land reliably on the main branch, with a check before the merge.
 
-## Zusammenspiel mit diesem Template
-| Ebene | Zuständig |
+## Interplay with this template
+| Level | Responsible |
 |---|---|
-| Im Repo: Regeln (`AGENTS.md`), Subagenten (evaluator, librarian), Skills, Skripte, Wiki | dieses Template |
-| Über dem Repo: Starten nach Zeitplan, Worktrees, Überwachung, Budget, Merge, Benachrichtigung | freilauf |
+| In the repo: rules (`AGENTS.md`), subagents (evaluator, librarian), skills, scripts, wiki | this template |
+| Above the repo: starting on schedule, worktrees, monitoring, budget, merge, notification | freilauf |
 
-Ein Projekt, das mit diesem Template eingerichtet ist, läuft in freilauf ohne weitere Anpassung: Die Regeln und Subagenten greifen in jedem Lauf, der Evaluator-Pass ist der natürliche Partner des Finish Gates. Sicherheitsmodell von freilauf beachten (VPN als Zugangsschicht; der Hub steuert tmux, das ist Shell-Zugriff).
+A project set up with this template runs in freilauf without further adaptation: the rules and subagents take hold in every run, the evaluator pass is the natural partner of the finish gate. Mind freilauf's security model (VPN as the access layer; the hub controls tmux, which is shell access).
 
-Einrichtung: `README` und `SETUP_WITH_AGENT.md` im freilauf-Repository – letzteres ist für Coding-Agenten geschrieben („Lies SETUP_WITH_AGENT.md und richte mir das ein").
+Setup: `README` and `SETUP_WITH_AGENT.md` in the freilauf repository – the latter is written for coding agents ("Read SETUP_WITH_AGENT.md and set this up for me").

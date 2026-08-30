@@ -1,13 +1,13 @@
-# Wiki-Index (Wurzel)
+# Wiki index (root)
 
-Katalog aller Seiten und Unterordner dieser Ebene. Nur Ein-Satz-Beschreibungen, keine eigenen Inhalte.
-Je Seite bzw. Unterordner ein Eintrag der Form `- [datei.md](datei.md) – Ein-Satz-Beschreibung (Stand: YYYY-MM-DD)`;
-Unterordner verlinken auf ihre eigene `index.md` (Pflicht in jedem Ordner).
+Catalog of all pages and subfolders at this level. One-sentence descriptions only, no content of its own.
+One entry per page or subfolder of the form `- [file.md](file.md) – one-sentence description (as of: YYYY-MM-DD)`;
+subfolders link to their own `index.md` (mandatory in every folder).
 
-## Seiten
+## Pages
 
-_(noch keine)_
+_(none yet)_
 
-## Unterordner
+## Subfolders
 
-_(noch keine)_
+_(none yet)_

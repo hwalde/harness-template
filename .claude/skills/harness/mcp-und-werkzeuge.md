@@ -1,59 +1,59 @@
-# MCP-Server und Werkzeuge: wann MCP, wann nicht
-**Kern:** MCP-Server geben dem Agenten Werkzeuge (Browser, Desktop, fremde Systeme); sie kosten Kontext und laufen mit deinen Rechten. Die Konkurrenz zum MCP-Server ist das Skript. (Kontext: Harness-Template | Stand: 2026-08-30)
+# MCP servers and tools: when MCP, when not
+**Core:** MCP servers give the agent tools (browser, desktop, external systems); they cost context and run with your permissions. The competitor to the MCP server is the script. (Context: harness template | As of: 2026-08-30)
 
-## Was MCP ist (in drei Sätzen)
-- Model Context Protocol: Client-Server-Protokoll (kein REST). Der Coding-Agent ist der Client, der Server ein laufendes Programm, das Funktionen als „Tools" anbietet.
-- Beim Start liest der Agent seine Konfiguration, verbindet sich, sammelt die Tool-Liste ein und hängt sie an seine eigenen Werkzeuge an. Ruft das Modell ein MCP-Tool auf, reicht der Agent den Aufruf an den Server weiter; das Ergebnis kommt als Text zurück.
-- Konfiguration = Command + Argumente + Umgebungsvariablen, auf Benutzer- oder Projektebene (Dateiname je Agent, siehe [agenten-kompatibilitaet.md](agenten-kompatibilitaet.md)). MCP-Server können **nicht** in einen Skill gelegt werden; verteilbar sind sie über Plugins.
+## What MCP is (in three sentences)
+- Model Context Protocol: a client-server protocol (not REST). The coding agent is the client, the server a running program that offers functions as "tools".
+- At start the agent reads its configuration, connects, collects the tool list, and appends it to its own tools. When the model calls an MCP tool, the agent forwards the call to the server; the result comes back as text.
+- Configuration = command + arguments + environment variables, at user or project level (file name per agent, see [agenten-kompatibilitaet.md](agenten-kompatibilitaet.md)). MCP servers can **not** be put into a skill; they are distributable via plugins.
 
-## Was sie kosten
-| Kostenart | Fakt |
+## What they cost
+| Cost type | Fact |
 |---|---|
-| Kontextfenster | Ohne Lazy Loading werden alle Tool-Beschreibungen bei **jedem** Request mitgeschickt: fünf Server ≈ 50k Tokens, mit Browser-Server schnell 100k. Claude Code lädt Tool-Beschreibungen inzwischen lazy (Tool-Search): ≈ 90 Tokens pro tatsächlich genutztem Tool plus ≈ 3 Zeilen pro Server. Andere Agenten (z. B. GitHub Copilot) schicken sie dauerhaft mit (Computer-Use-Server ≈ 12k, Playwright ≈ 4k). Prüfen mit `/context` bzw. dem Kontext-Befehl des Agenten. |
-| Ungenutzte Server | kosten trotzdem bei jedem Request → Server für gerade nicht genutzte Plattformen abschalten. |
-| Arbeitsspeicher | Standardbauweise: eine Server-Instanz pro Agent-Instanz. Viele offene Agenten = viel RAM; Extremfall 12 GB für einen Server. |
-| Sicherheit | Ein MCP-Server läuft **mit deinen Rechten** und ist praktisch nicht prüfbar (vollständige Anwendung, bei jedem Update von vorn). Ein Server, der Quelltext ins Netz lädt, wird von keinem Virenscanner erkannt. Unbekannte Herkunft → nicht installieren. Secrets landen mitunter in der MCP-Konfiguration – nie ins Repo committen. |
-| Massen-Installation | Verzeichnisse listen tausende Server. Jeder zusätzliche Server (wie jeder Skill, jeder Subagent) senkt die Modellleistung und erhöht die Kosten. Installiert wird, was das Projekt braucht – nichts „auf Vorrat". |
+| Context window | Without lazy loading, all tool descriptions are sent along with **every** request: five servers ≈ 50k tokens, with a browser server quickly 100k. Claude Code now loads tool descriptions lazily (tool search): ≈ 90 tokens per actually used tool plus ≈ 3 lines per server. Other agents (e.g., GitHub Copilot) send them along permanently (computer-use server ≈ 12k, Playwright ≈ 4k). Check with `/context` or the agent's context command. |
+| Unused servers | still cost on every request → switch off servers for platforms not currently in use. |
+| Memory | standard construction: one server instance per agent instance. Many open agents = a lot of RAM; extreme case 12 GB for one server. |
+| Security | An MCP server runs **with your permissions** and is practically unauditable (a complete application, from scratch on every update). A server that uploads source code to the net is detected by no virus scanner. Unknown origin → do not install. Secrets sometimes end up in the MCP configuration – never commit it to the repo. |
+| Mass installation | Directories list thousands of servers. Every additional server (like every skill, every subagent) lowers model performance and raises costs. What gets installed is what the project needs – nothing "in stock". |
 
-## Entscheidungsregel: MCP-Server oder CLI/Skript?
-Vorfrage vor jeder Erweiterung: **Ist die Aufgabe algorithmisch entscheidbar?** Dann Skript (deterministisch, ein Fehler ist ein reparierbarer Bug). Braucht sie Fachlichkeit oder Abwägung, bleibt sie beim Modell. Erst danach die Frage MCP oder CLI:
+## Decision rule: MCP server or CLI/script?
+The preliminary question before every extension: **is the task algorithmically decidable?** Then a script (deterministic, an error is a fixable bug). If it needs domain judgment or weighing, it stays with the model. Only then the question MCP or CLI:
 
-| Kriterium | → MCP-Server | → CLI-Tool / Skript |
+| Criterion | → MCP server | → CLI tool / script |
 |---|---|---|
-| Zustand | zustandshaltend: offene Browser-Tabs, Sitzung, Fenster, das so lange lebt wie der Server | zustandslos: „läuft der Server, ist der Port frei, was steht im Log", kleine wiederverwendete Algorithmen |
-| Entfernung | Funktion läuft auf einem anderen Rechner; eigene Anwendung soll von außen benutzbar sein | REST-API direkt ansprechen oder ein Skript über die API bauen |
-| Nutzungshäufigkeit | ständig gebraucht (Browser-Steuerung täglich) | situativ gebraucht |
-| Sichtbarkeit | Werkzeug soll omnipräsent im Blick des Modells sein | ein Satz in `AGENTS.md` an der richtigen Stelle genügt |
-| Vorhandenes CLI | – | gibt es ein Kommandozeilen-Tool (`gh`, Hersteller-CLIs, `kubectl`, `aws`, `psql` …), ist ein MCP-Server überflüssig – der Agent kennt diese Tools oft besser als der Entwickler |
-| Prüfbarkeit | kaum prüfbar, volle Rechte | lesbar, prüfbar, im Repo versioniert |
-| Modellstärke | kleine/lokale Modelle vergessen Skripte → MCP | starke Modelle merken sich einen Hinweis |
-| Paketierung | nur Benutzer-/Projektebene, nicht im Skill; Secrets in der Konfiguration | Skript liegt im Repo oder Skill-Ordner |
+| State | stateful: open browser tabs, a session, a window that lives as long as the server | stateless: "is the server running, is the port free, what is in the log", small reused algorithms |
+| Remoteness | the function runs on another machine; your own application should be usable from outside | address the REST API directly or build a script over the API |
+| Usage frequency | needed constantly (browser control daily) | needed situationally |
+| Visibility | the tool should be omnipresent in the model's view | one sentence in `AGENTS.md` in the right place suffices |
+| Existing CLI | – | if a command-line tool exists (`gh`, vendor CLIs, `kubectl`, `aws`, `psql` …), an MCP server is superfluous – the agent often knows these tools better than the developer |
+| Auditability | barely auditable, full permissions | readable, auditable, versioned in the repo |
+| Model strength | small/local models forget scripts → MCP | strong models remember a hint |
+| Packaging | user/project level only, not in a skill; secrets in the configuration | the script lives in the repo or skill folder |
 
-Faustregel: **Zustand, Entfernung oder tägliche Nutzung → MCP. Alles andere → Skript** ([skripte.md](skripte.md)). Ein MCP-Server, der einen vorhandenen CLI-Befehl nachbaut, ist ein Fehler.
+Rule of thumb: **state, remoteness, or daily use → MCP. Everything else → script** ([skripte.md](skripte.md)). An MCP server that recreates an existing CLI command is a mistake.
 
-## Bereitstellen ist nicht Benutzen
-Ein installiertes Werkzeug wird nicht automatisch verwendet. Soll es verwendet werden, steht das ausdrücklich in `AGENTS.md`: „Für X IMMER Werkzeug Y verwenden" – bei Bedarf mit dem Gegenstück „NICHT Z". Beispiele: „Kann eine Webseite nicht gelesen werden (Fetch geblockt), Playwright-MCP zum Lesen verwenden." · „Computer Use darf zum Debuggen der Desktop-App eingesetzt werden."
+## Providing is not using
+An installed tool is not used automatically. If it is to be used, that is stated explicitly in `AGENTS.md`: "For X ALWAYS use tool Y" – if needed with the counterpart "NOT Z". Examples: "If a web page cannot be read (fetch blocked), use the Playwright MCP to read it." · "Computer use may be employed to debug the desktop app."
 
-## Empfohlene Befähigung je Anwendungstyp
-Ziel der Befähigung: Der Agent kommt selbst an Informationen, testet und schaut sich Dinge selbst an – jede Schleife „Mensch klickt durch und schreibt einen Prompt, dass etwas nicht geht" kostet Zeit.
+## Recommended enablement per application type
+The goal of enablement: the agent obtains information itself, tests, and looks at things itself – every loop of "human clicks through and writes a prompt that something does not work" costs time.
 
-| Anwendung | Empfehlung |
+| Application | Recommendation |
 |---|---|
-| Kommandozeile / Bibliothek | keine Browser-/Desktop-Steuerung nötig; Tests und Skripte reichen |
-| Web-Anwendung | **Playwright-MCP** (oder Selenium/Puppeteer-Äquivalent): Seite öffnen, durchklicken, Formulare ausfüllen, Screenshots machen, Browser-Konsole und Netzwerk lesen. Auf Servern headless. Bauformen: eigener leerer Browser (keine Logins, sicher) · Tab-Reihe im echten Browser (Logins vorhanden, viel Zugriff – abwägen) · Hybrid mit gesperrten Seiten. **Ersetzt keine Tests** – es dient dem Ausprobieren und Anschauen während der Arbeit; am Ende läuft ein E2E-Test. |
-| Desktop-Anwendung | **cua-computer-use** (Open-Source-Computer-Use-MCP): dasselbe für Desktop-Apps, Anwendung darf im Hintergrund laufen. Der Agent nutzt es als Debug-Werkzeug nur, wenn `AGENTS.md` es ausdrücklich erlaubt. |
-| Layout-/Design-Arbeit | Multimodale Modelle sehen Screenshots ohnehin; ein Vision-Server (Positionen, Abstände) nur bei konkretem Bedarf |
-| Bilder erzeugen | Bildgenerierungs-Server nur, wenn das Projekt Bilder braucht |
-| E-Mail | nur **lesend** (List/Read, keine Send-Funktion) – z. B. um Bestätigungsmails/Newsletter-Anmeldungen zu prüfen. Rote Linie: kein Versand ohne menschliche Freigabe. |
-| Ticket-/Wiki-/Pipeline-Systeme (Jira, Confluence, CI) | prüfen, ob ein CLI existiert; Confluence-Inhalte sind für Menschen geschrieben und oft eine Müllhalde – ein agentengerechtes Wiki ([wissensablage.md](wissensablage.md)) ist meist die bessere Quelle |
+| Command line / library | no browser/desktop control needed; tests and scripts suffice |
+| Web application | **Playwright MCP** (or a Selenium/Puppeteer equivalent): open the page, click through, fill forms, take screenshots, read the browser console and network. Headless on servers. Setups: its own empty browser (no logins, safe) · a row of tabs in the real browser (logins present, a lot of access – weigh it) · hybrid with locked pages. **Replaces no tests** – it is for trying out and looking at things during the work; at the end an E2E test runs. |
+| Desktop application | **cua-computer-use** (open-source computer-use MCP): the same for desktop apps, the application may run in the background. The agent uses it as a debugging tool only if `AGENTS.md` explicitly allows it. |
+| Layout/design work | multimodal models see screenshots anyway; a vision server (positions, distances) only on concrete need |
+| Generating images | an image-generation server only if the project needs images |
+| Email | **read-only** (list/read, no send function) – e.g., to check confirmation emails/newsletter sign-ups. Red line: no sending without human approval. |
+| Ticket/wiki/pipeline systems (Jira, Confluence, CI) | check whether a CLI exists; Confluence content is written for humans and often a garbage dump – an agent-friendly wiki ([wissensablage.md](wissensablage.md)) is usually the better source |
 
-## Konfigurationsorte (Kurzfassung)
-Projektlokal, damit jeder Klon dieselben Werkzeuge hat; Secrets über Umgebungsvariablen, nie im Repo. Dateinamen je Agent in [agenten-kompatibilitaet.md](agenten-kompatibilitaet.md). Vor und nach dem Hinzufügen den Kontextverbrauch prüfen.
+## Configuration locations (short version)
+Project-local, so that every clone has the same tools; secrets via environment variables, never in the repo. File names per agent in [agenten-kompatibilitaet.md](agenten-kompatibilitaet.md). Check the context consumption before and after adding.
 
-## Fallstricke
-- MCP-Server nur, weil er im Verzeichnis steht – ohne Use Case. Erst der Use Case, dann der Server.
-- GitHub-/GitLab-MCP installiert, obwohl `gh`/`glab` da sind.
-- Hersteller-CLIs bringen MCP-Server ungefragt mit → Kontext-Ansicht prüfen.
-- Browser-Steuerung als Testersatz missverstanden.
-- Tab-Reihe im echten Browser: der Agent darf dann nie den Browser schließen oder fremde Tabs anfassen – gehört als Regel in `AGENTS.md`, wenn diese Bauform gewählt wird.
-- Computer Use ohne ausdrückliche Erlaubnis wird nicht als Debug-Werkzeug genutzt.
+## Pitfalls
+- An MCP server just because it is listed in a directory – without a use case. First the use case, then the server.
+- A GitHub/GitLab MCP installed although `gh`/`glab` are there.
+- Vendor CLIs bring MCP servers along unasked → check the context view.
+- Browser control misunderstood as a substitute for tests.
+- A row of tabs in the real browser: the agent must then never close the browser or touch other tabs – belongs as a rule in `AGENTS.md` if this setup is chosen.
+- Computer use without explicit permission is not used as a debugging tool.

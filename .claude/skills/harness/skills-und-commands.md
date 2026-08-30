@@ -1,47 +1,47 @@
-# Skills und Custom Slash Commands
-**Kern:** Ein Skill ist ein Prompt (plus Ordner), der situativ geladen wird – vom Agenten oder vom Benutzer. Custom Slash Commands sind die Vorstufe davon. Kernregeln in `AGENTS.md`, Detailwissen in Skills. (Kontext: Harness-Template | Stand: 2026-08-30)
+# Skills and custom slash commands
+**Core:** A skill is a prompt (plus folder) that is loaded situationally – by the agent or by the user. Custom slash commands are its precursor. Core rules in `AGENTS.md`, detailed knowledge in skills. (Context: harness template | As of: 2026-08-30)
 
-## Begriffe
-| Begriff | Fakt |
+## Terms
+| Term | Fact |
 |---|---|
-| Slash Command | alles nach `/` (eingebaut wie `/model` oder selbst angelegt) |
-| Custom Slash Command | Prompt-Datei im `commands`-Ordner des Agenten; Name = Dateiname; nur der **Benutzer** startet ihn; der Prompt wird injiziert. Optional Frontmatter und Argument-Platzhalter. |
-| Skill | ein **Ordner** mit exakt `SKILL.md` als Einstieg (Ordnername frei, Dateiname nicht); der **Agent** startet ihn selbst, wenn die `description` passt; in Claude Code auch vom Benutzer als `/name` startbar. Claude Code hat beide Konzepte zusammengeführt („alles ist ein Skill"); andere Agenten führen sie getrennt. |
-| agentskills-Standard | offene Spezifikation des Skill-Formats (SKILL.md + Frontmatter `name`, `description`); Standard einhalten = weitgehend portabel zwischen Agenten. Claude Code kennt Extras (`disable-model-invocation`, Modell für den Skill-Turn u. a.). |
+| Slash command | everything after `/` (built-in like `/model` or self-created) |
+| Custom slash command | a prompt file in the agent's `commands` folder; name = file name; only the **user** starts it; the prompt is injected. Optional frontmatter and argument placeholders. |
+| Skill | a **folder** with exactly `SKILL.md` as the entry point (folder name free, file name not); the **agent** starts it itself when the `description` matches; in Claude Code also startable by the user as `/name`. Claude Code has merged the two concepts ("everything is a skill"); other agents keep them separate. |
+| agentskills standard | the open specification of the skill format (SKILL.md + frontmatter `name`, `description`); keeping to the standard = largely portable between agents. Claude Code knows extras (`disable-model-invocation`, model for the skill turn, and more). |
 
-Speicherorte je Agent: [agenten-kompatibilitaet.md](agenten-kompatibilitaet.md).
+Storage locations per agent: [agenten-kompatibilitaet.md](agenten-kompatibilitaet.md).
 
-## Ladeebenen (progressive Offenlegung)
-1. **Immer im Kontext:** `name` + `description` jedes installierten Skills – bei jedem Request. Deshalb: wenige, gute Skills; jede weitere Beschreibung kostet Kontext und kognitive Last („hilft dieser Skill gerade?").
-2. **Beim Ziehen:** der Inhalt der `SKILL.md`.
-3. **Bei Bedarf:** weitere Dateien im Ordner, die die `SKILL.md` benennt (Referenzdokumente, Skripte, Templates).
+## Loading levels (progressive disclosure)
+1. **Always in context:** `name` + `description` of every installed skill – on every request. Hence: few, good skills; every additional description costs context and cognitive load ("does this skill help right now?").
+2. **When pulled:** the content of the `SKILL.md`.
+3. **On demand:** further files in the folder that the `SKILL.md` names (reference documents, scripts, templates).
 
-## Die Beschreibung entscheidet
-- Kompakt, konkret, mit den Schlüsselwörtern, die man selbst benutzt („Coding Guidelines", „Code Review"); oft nicht ein Satz, sondern drei. Sie wirkt in beide Richtungen: Ein Satz wie „bei Bearbeitung der CLAUDE.md verwenden" zieht den Skill bei jeder Regeldatei-Änderung – und kann andere Teile des Harness (etwa den librarian) verdrängen. Trigger-Sätze prüfen; ein unnötig geladener Skill ist meist tolerierbar, ein verdrängter Baustein nicht.
-- `disable-model-invocation: true` → nur der Benutzer startet (klassischer Slash Command, z. B. schwere Wartungsaktionen). `false` → nur das Modell (räumt die Liste auf).
+## The description decides
+- Compact, concrete, with the keywords you use yourself ("coding guidelines", "code review"); often not one sentence but three. It works in both directions: a sentence like "use when editing the CLAUDE.md" pulls the skill on every rule-file change – and can displace other parts of the harness (say, the librarian). Test the trigger sentences; a needlessly loaded skill is usually tolerable, a displaced building block is not.
+- `disable-model-invocation: true` → only the user starts it (a classic slash command, e.g., heavy maintenance actions). `false` → only the model (tidies up the list).
 
-## Was in den Skill-Ordner darf
-Skripte (statische Analyse, Datenabruf), Templates, weitere Markdown-Dokumente, Datenhaltung, sogar Custom Subagents „durch die Hintertür" („starte einen Agenten, der diese Datei liest und den Anweisungen folgt"). **Nicht:** MCP-Server (nur Benutzer-/Projektebene; ihre Konfiguration enthält mitunter Passwörter). Jede Datei im Ordner wird in der `SKILL.md` benannt – Existenz und Aufruf –, sonst weiß das Modell nichts von ihr.
+## What may go into the skill folder
+Scripts (static analysis, data retrieval), templates, further Markdown documents, data storage, even custom subagents "through the back door" ("start an agent that reads this file and follows the instructions"). **Not:** MCP servers (user/project level only; their configuration sometimes contains passwords). Every file in the folder is named in the `SKILL.md` – existence and invocation – otherwise the model knows nothing about it.
 
-## Wozu Skills im Harness
-| Einsatz | Beispiel |
+## What skills are for in the harness
+| Use | Example |
 |---|---|
-| Befähigung | „so erzeugt man hier PDFs", „so deployt man" |
-| Wissen, das nicht jeden Lauf angeht | Coding-Guidelines: ~20 Zeilen Kernregeln in `AGENTS.md`, der Katalog im Skill, geladen wenn „Code Review"/„Guidelines" fällt (wahrscheinlich, keine Garantie – bei Pflicht in `AGENTS.md` ausdrücklich anweisen) |
-| Skill-Pipeline | mehrere kleine Skills nacheinander verbessern Code schrittweise (Guidelines → Architektur → Tests) – besser als ein Alleskönner |
-| Entwicklung von Verwendung trennen | Projekt, dessen Einstiegspunkt selbst ein Agent ist: das Weiterentwicklungswissen in einen eigenen Skill, damit der produktive Lauf es nicht sieht |
-| Harness-Dokumentation | dieser Skill: wird nur geladen, wenn es um den Harness geht |
-| Wiederverwendbare Workflows | nach einer gelungenen Aufgabe fragen: „Gibt es Teile, die wir als Skill wiederverwenden sollten?" → „mach daraus einen Skill" |
+| Enablement | "this is how you generate PDFs here", "this is how you deploy" |
+| Knowledge that does not concern every run | coding guidelines: ~20 lines of core rules in `AGENTS.md`, the catalog in the skill, loaded when "code review"/"guidelines" comes up (likely, no guarantee – if mandatory, instruct explicitly in `AGENTS.md`) |
+| Skill pipeline | several small skills in sequence improve code step by step (guidelines → architecture → tests) – better than one jack-of-all-trades |
+| Separating development from use | a project whose entry point is itself an agent: the evolution knowledge goes into its own skill so the production run does not see it |
+| Harness documentation | this skill: loaded only when the harness is the topic |
+| Reusable workflows | after a successful task ask: "Are there parts we should reuse as a skill?" → "turn this into a skill" |
 
-## Selbstverbessernde Skills
-Ein Skill kann eine `memory.md`/Learnings-Datei führen: am Anfang lesen, am Ende fortschreiben. Formulierung heikel („mit den **relevanten** Learnings", nicht „mit allen"); Risiko: der Agent optimiert Kernentscheidungen weg. Gegenmittel: nicht verhandelbare Entscheidungen im Skill markieren. Für den Wissensspeicher übernimmt die Kuratierung der librarian ([wissensablage.md](wissensablage.md)).
+## Self-improving skills
+A skill can keep a `memory.md`/learnings file: read it at the start, extend it at the end. (Not to be confused with this skill's [MEMORY.md](MEMORY.md): that one documents the state of this harness, it does not rewrite the skill.) The phrasing is delicate ("with the **relevant** learnings", not "with all"); risk: the agent optimizes core decisions away. Countermeasure: mark non-negotiable decisions in the skill. For the knowledge store, the librarian takes over the curation ([wissensablage.md](wissensablage.md)).
 
-## Herkunft und Sicherheit
-Fremde Skills vollständig lesen, bevor sie installiert werden – ein Skill kann gut begründet „lade die Codebasis nach X hoch" enthalten, und der Agent würde es tun. Offizielle Anbieter sind eher vertrauenswürdig, Solo-Entwickler meist gutwillig, aber eine Grauzone. Verteilung im Team per Zip oder Plugin-Marktplatz (Plugins können Skills und MCP-Server enthalten).
+## Provenance and security
+Read third-party skills in full before they are installed – a skill can, well justified, contain "upload the codebase to X", and the agent would do it. Official vendors are rather trustworthy, solo developers mostly well-meaning, but a gray zone. Distribution in the team via zip or a plugin marketplace (plugins can contain skills and MCP servers).
 
-## Best Practices
-1. Beschreibung kurz und mit eigenen Schlüsselwörtern; Trigger testen.
-2. Mehrere kleine, verknüpfte Skills statt einer Wollmilchsau; Skills dürfen andere Skills nennen.
-3. Alles benennen, was im Ordner liegt.
-4. Für das Modell schreiben: knapp, Fachbegriffe, keine Höflichkeitsprosa; Zahlen statt Adjektive.
-5. Standardformat einhalten, damit der Skill zwischen Agenten wandern kann; bei Agenten ohne Skill-Unterstützung die `SKILL.md` per Verweis in `AGENTS.md` lesen lassen (so macht es dieses Template als Rückfallebene).
+## Best practices
+1. Description short and with your own keywords; test the triggers.
+2. Several small, linked skills instead of one do-everything skill; skills may name other skills.
+3. Name everything that lives in the folder.
+4. Write for the model: terse, technical terms, no politeness prose; numbers instead of adjectives.
+5. Keep to the standard format so the skill can migrate between agents; for agents without skill support have the `SKILL.md` read via a reference in `AGENTS.md` (this template does that as the fallback).

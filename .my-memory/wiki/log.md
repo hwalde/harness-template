@@ -1,3 +1,3 @@
-# Pflege-Journal (append-only)
+# Maintenance journal (append-only)
 
-## [2026-08-30] wartung | Wiki-Skelett angelegt (Auslieferungszustand des Templates)
+## [2026-08-30] maintenance | Wiki skeleton created (template initial state)

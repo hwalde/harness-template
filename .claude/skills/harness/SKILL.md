@@ -1,50 +1,57 @@
 ---
 name: harness
 description: >-
-  Dokumentation und Einrichtungsleitfaden des Harness dieses Projekts: Regeldateien
-  (AGENTS.md/CLAUDE.md, Unterordner, rules), Subagenten evaluator und librarian, LLM-Wiki
-  und Wissensablage, Skills, MCP-Server (wann MCP, wann Skript), Skripte für Agenten,
-  autonome Läufe (rückfragefreie Modi, tmux/psmux, Usage, Selbstüberwachung), Workflow und
-  Evaluator-Ketten, Kompatibilität der Coding-Agenten, freilauf. Laden, wenn der Benutzer
-  etwas zu diesem Harness fragt, ihn einrichten, erweitern oder verbessern will, oder wenn
-  ein Harness-Baustein (Skript, Subagent, Skill, MCP-Konfiguration, Regeldatei) angelegt
-  oder geändert werden soll.
+  Documentation and setup guide for this project's harness: rule files
+  (AGENTS.md/CLAUDE.md, subfolders, rules), the subagents evaluator and librarian, LLM wiki
+  and knowledge storage, skills, MCP servers (when MCP, when a script), scripts for agents,
+  autonomous runs (no-questions modes, tmux/psmux, usage, self-monitoring), workflow and
+  evaluator chains, coding-agent compatibility, freilauf. Load when the user asks
+  anything about this harness, wants to set it up, extend or improve it, or when
+  a harness building block (script, subagent, skill, MCP configuration, rule file) is to be
+  created or changed.
 ---
 
-# Harness-Wissen
+# Harness knowledge
 
-Dieser Skill ist die Dokumentation des Harness in diesem Projekt – aufgebaut wie ein kleines
-LLM-Wiki: `index.md` ist der Katalog, die Dokumente liegen flach daneben. Die Inhalte sind
-verdichtete Auszüge aus Erfahrung mit Coding-Agenten, geschrieben für dich als Leser.
+This skill is the documentation of the harness in this project – structured like a small
+LLM wiki: `index.md` is the catalog, the documents lie flat next to it. The contents are
+condensed extracts from experience with coding agents, written for you as the reader.
 
-## Vorgehen
+## Procedure
 
-1. Lies `index.md` in diesem Ordner und wähle die Dokumente, die dein Thema berühren.
-2. **Halbwissen ist gefährlich.** Bei Einrichtung, Umbau oder Erweiterung des Harness liest du
-   ALLE Dokumente, nicht nur `einrichtung.md`. Bei einer Einzelfrage die relevanten.
-3. **Einrichtung:** `einrichtung.md` führt den Benutzer Schritt für Schritt durch die
-   Entscheidungen; Ergebnisse landen als knappe Sätze in `AGENTS.md`. Am Ende wird der
-   Einrichtungs-Absatz aus `AGENTS.md` gelöscht.
-4. **Skripte** für diesen Harness werden IMMER nach den Prinzipien in `skripte.md` gebaut –
-   ohne Nachfrage, sie gelten hier.
-5. **MCP-Server** nur nach der Entscheidungsregel in `mcp-und-werkzeuge.md`.
-6. Änderungen am Harness gehen wie jede andere Arbeit durch den evaluator, und das betroffene
-   Dokument hier (plus `index.md`) wird nachgezogen – so bleibt die Dokumentation die Wahrheit.
+1. Read `MEMORY.md` first – it records the state of THIS harness beyond `AGENTS.md`: setup
+   status, the coding agents in use, sync duties, decisions with their reasons, deviations,
+   open points. Update it after every change to the harness. State belongs there, rules
+   belong in `AGENTS.md`.
+2. Read `index.md` in this folder and pick the documents that touch your topic.
+3. **Half-knowledge is dangerous.** For setup, restructuring, or extension of the harness,
+   read ALL documents, not just `einrichtung.md`. For a single question, the relevant ones.
+4. **Setup:** `einrichtung.md` walks the user step by step through the
+   decisions; rules for regular operation land as terse sentences in `AGENTS.md`, the state of
+   the harness (agents, sync duties, decisions with reasons, open points) in `MEMORY.md`. At
+   the end, the setup paragraph is deleted from `AGENTS.md`.
+5. **Scripts** for this harness are ALWAYS built following the principles in `skripte.md` –
+   without asking, they apply here.
+6. **MCP servers** only per the decision rule in `mcp-und-werkzeuge.md`.
+7. Changes to the harness go through the evaluator like any other work, and the affected
+   document here (plus `index.md` and `MEMORY.md`) is updated – this keeps the documentation
+   the truth.
 
-## Dateien in diesem Ordner
+## Files in this folder
 
-| Datei | Inhalt |
+| File | Content |
 |---|---|
-| `index.md` | Katalog aller Dokumente mit Ein-Satz-Beschreibung |
-| `einrichtung.md` | geführte Einrichtung des Harness mit dem Benutzer |
-| `grundlagen.md` | was ein Harness ist, Checkliste eines guten Harness |
-| `regeldateien.md` | AGENTS.md/CLAUDE.md, Unterordner-Regeldateien, rules, Schreibstil |
-| `agenten-kompatibilitaet.md` | welcher Coding-Agent was unterstützt und wo Dateien liegen |
-| `wissensablage.md` | LLM-Wiki mit librarian, was hinein gehört, Alternativen |
-| `evaluatoren.md` | Evaluator-Pattern, mehrere/spezialisierte Evaluatoren, Vorlage |
-| `skills-und-commands.md` | Skills, Slash Commands, Guideline-Skills |
-| `mcp-und-werkzeuge.md` | wann MCP, wann Skript; Playwright, cua, weitere Server |
-| `skripte.md` | die zehn Prinzipien für Skripte, die Agenten zuarbeiten |
-| `autonome-laeufe.md` | Permission-Modi, Sandbox, tmux/psmux, Usage, Selbstüberwachung, `tools/agent-start.py` |
-| `workflow.md` | Standard-Workflow, Planungsstufen, Testing, Evaluator-Ketten |
-| `freilauf.md` | der Überbau zum Laufenlassen und Überwachen von Agenten |
+| `MEMORY.md` | state of THIS harness beyond `AGENTS.md`: setup status, agents in use, sync duties, decisions, deviations, open points |
+| `index.md` | catalog of all documents with a one-sentence description |
+| `einrichtung.md` | guided setup of the harness with the user |
+| `grundlagen.md` | what a harness is, checklist of a good harness |
+| `regeldateien.md` | AGENTS.md/CLAUDE.md, subfolder rule files, rules, writing style |
+| `agenten-kompatibilitaet.md` | which coding agent supports what and where files live |
+| `wissensablage.md` | LLM wiki with librarian, what belongs in it, alternatives |
+| `evaluatoren.md` | evaluator pattern, multiple/specialized evaluators, template |
+| `skills-und-commands.md` | skills, slash commands, guideline skills |
+| `mcp-und-werkzeuge.md` | when MCP, when a script; Playwright, cua, further servers |
+| `skripte.md` | the ten principles for scripts that support agents |
+| `autonome-laeufe.md` | permission modes, sandbox, tmux/psmux, usage, self-monitoring, `tools/agent-start.py` |
+| `workflow.md` | standard workflow, planning levels, testing, evaluator chains |
+| `freilauf.md` | the superstructure for letting agents run and monitoring them |

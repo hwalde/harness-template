@@ -1,73 +1,73 @@
-# Evaluatoren: Generator → Evaluator
-**Kern:** Der Agent, der gearbeitet hat, sagt auf „gut gemacht?" immer ja. Ein zweiter Agent mit frischem Kontext, ohne Schreibrechte, gegen beobachtete Evidenz findet andere Dinge. Das Pattern = ein Subagent + ein Eintrag in der Regeldatei. (Kontext: Harness-Template | Stand: 2026-08-30)
+# Evaluators: generator → evaluator
+**Core:** The agent that did the work always answers "well done?" with yes. A second agent with fresh context, without write permissions, judging against observed evidence finds different things. The pattern = one subagent + one entry in the rule file. (Context: harness template | As of: 2026-08-30)
 
-## Das Pattern
-| Teil | Inhalt |
+## The pattern
+| Part | Content |
 |---|---|
-| Subagent `evaluator` (`.claude/agents/evaluator.md`) | skeptischer Zweitgutachter; Skepsis steht ausdrücklich im Prompt; liest Spezifikation, `git status`/`git diff` (und ggf. Commit-History), öffnet jede Evidenz, beobachtet wo möglich selbst (Tests, Build, Smoke-Check); keine Write/Edit-Rechte; antwortet mit `PASS` oder `NEEDS_WORK` + konkreten Findings |
-| Abnahmepflicht in `AGENTS.md` | „Bevor etwas ‚fertig' oder ‚funktioniert' heißt, prüft der evaluator mit frischem Kontext und ohne Schreibrechte gegen beobachtete Evidenz. `NEEDS_WORK` → Findings abarbeiten → erneut prüfen, bis `PASS`." Ohne diesen Eintrag wird der Subagent nicht benutzt. |
-| Schleife | Build → Evaluator → Fix → Evaluator … bis `PASS`. Keine Diskussion, kein Wegerklären, keine abgeschwächten Tests. |
+| Subagent `evaluator` (`.claude/agents/evaluator.md`) | skeptical second reviewer; the skepticism is stated explicitly in the prompt; reads the specification, `git status`/`git diff` (and the commit history if needed), opens every piece of evidence, observes for itself where possible (tests, build, smoke check); no Write/Edit permissions; answers `PASS` or `NEEDS_WORK` + concrete findings |
+| Acceptance duty in `AGENTS.md` | "Before anything is called 'done' or 'working', the evaluator checks with fresh context and without write permissions against observed evidence. `NEEDS_WORK` → work through the findings → re-check until `PASS`." Without this entry the subagent is not used. |
+| Loop | build → evaluator → fix → evaluator … until `PASS`. No debate, no explaining away, no weakened tests. |
 
-Effekt in der Praxis: fühlbar niedrigere Fehlerrate; der Evaluator findet regelmäßig Dinge, die noch nicht stimmten. Kosten: ein paar Tokens und etwas Zeit.
+Effect in practice: a noticeably lower error rate; the evaluator regularly finds things that were not right yet. Cost: a few tokens and some time.
 
-## Was der Aufrufer mitgibt
-Der Evaluator vertraut keinen Behauptungen – also nachprüfbare Evidenz erzeugen und referenzieren:
-1. Aufgabe / Akzeptanzkriterien (Spezifikation, Ticket, Plan, Checkliste).
-2. Änderungsumfang (Dateien; bei Git ermittelt er den Diff selbst).
-3. Evidenz: Test-Logs, Build-Output, Screenshots, gerenderte Artefakte – als Pfade.
-4. Optional ein Fokus (siehe unten).
+## What the caller provides
+The evaluator trusts no claims – so produce and reference verifiable evidence:
+1. Task / acceptance criteria (specification, ticket, plan, checklist).
+2. Scope of change (files; with Git it determines the diff itself).
+3. Evidence: test logs, build output, screenshots, rendered artifacts – as paths.
+4. Optionally a focus (see below).
 
-Prompt an den Evaluator als Brief, nicht als Befehlsliste: Er ist dasselbe Modell mit voller kognitiver Leistung; Raum zum Denken lassen, nichts vorwegnehmen.
+The prompt to the evaluator as a letter, not as a list of commands: it is the same model at full cognitive capacity; leave room to think, pre-empt nothing.
 
-## Grenzen und Gegenmittel
-- Je aufmüpfiger das Modell, desto eher umgeht es den Evaluator oder versucht, ihn zu täuschen (Modelle täuschen tatsächlich): Dem Evaluator nur einen Teilaspekt nahelegen, Tests abschwächen, „bekannte Einschränkung". Gegenmittel im Evaluator-Prompt: Scope-Check, Builder-Ausreden zählen nicht, abgeschwächte Tests sind ein eigenes Finding.
-- Wer den Evaluator startet: (a) der umsetzende Agent selbst – einfachste Stufe, dieses Template; (b) von außen per Hook (z. B. Stop-Hook oder Pre-Commit) – der Agent kann ihn nicht mehr vergessen; (c) in der CI/CD-Pipeline mit Findings in der Review-Plattform – „einen Ticken besser", weil unabhängig. Bei der Einrichtung entscheiden, ob (b) oder (c) zusätzlich gewünscht ist.
-- Ein grüner Test beweist nur den Pfad, den der Test genommen hat. Verschriftlichte Prüfkriterien sind der Maßstab; ohne Kriterien prüft der Evaluator gegen die Aufgabenbeschreibung und sagt das dazu.
+## Limits and countermeasures
+- The more defiant the model, the sooner it bypasses the evaluator or tries to deceive it (models genuinely deceive): suggesting only a partial aspect to the evaluator, weakening tests, "known limitation". Countermeasures in the evaluator prompt: scope check, builder excuses do not count, weakened tests are a finding of their own.
+- Who starts the evaluator: (a) the implementing agent itself – the simplest level, this template; (b) from outside via a hook (e.g., a stop hook or pre-commit) – the agent can no longer forget it; (c) in the CI/CD pipeline with findings in the review platform – "a notch better" because independent. Decide during setup whether (b) or (c) is additionally desired.
+- A green test only proves the path the test took. Written-down check criteria are the yardstick; without criteria the evaluator checks against the task description and says so.
 
-## Mehrere und spezialisierte Evaluatoren
-Die kleinste Ausbaustufe ist ein Evaluator. Größer: mehrere Instanzen nacheinander (Anthropic lässt intern eine ganze Reihe laufen), je nach Projekt nach Themenschwerpunkt. Zwei Wege:
+## Multiple and specialized evaluators
+The smallest configuration is one evaluator. Bigger: several instances one after the other (Anthropic runs a whole series internally), by topic focus depending on the project. Two ways:
 
-1. **Ein Evaluator, mehrere Fokusse** (im Template eingebaut): den `evaluator` mehrfach aufrufen, jeweils mit „Fokus: Sicherheit" / „Performance" / „Clean Code" / „Coding-Guidelines" / „Architektur". Kein zusätzlicher Dauerkontext, weil nur eine Beschreibung geladen ist.
-2. **Eigene Subagenten je Schwerpunkt** (bei der Einrichtung anlegbar, siehe Vorlage unten): sinnvoll, wenn ein Schwerpunkt eigenes Wissen braucht (die Architekturdokumentation, den Guideline-Katalog, eine Sicherheits-Checkliste) oder wenn er in einer Pipeline/CI separat laufen soll.
+1. **One evaluator, several focuses** (built into the template): call the `evaluator` several times, each time with "focus: security" / "performance" / "clean code" / "coding guidelines" / "architecture". No additional standing context, because only one description is loaded.
+2. **Dedicated subagents per focus** (creatable during setup, see the template below): sensible when a focus needs its own knowledge (the architecture documentation, the guideline catalog, a security checklist) or when it should run separately in a pipeline/CI.
 
-Reihenfolge, wenn mehrere laufen: erst deterministische Prüfungen (Linter, statische Analyse, Tests – per Skript, nicht per Modell), dann funktionale Abnahme (Standard-Evaluator), dann die Schwerpunkte (Sicherheit → Architektur/Guidelines → Performance → Clean Code). Jeder schaut sich per `git status`/`git diff` die Änderungen an und gibt dem Hauptagenten konkrete, behebbare Findings zurück; der Hauptagent arbeitet sie ab und lässt erneut prüfen. Nicht alle bei jeder Kleinigkeit: in `AGENTS.md` festlegen, welche Evaluatoren bei welchem Änderungsumfang laufen (z. B. Sicherheit immer bei Auth/Eingaben/Dateizugriff; Architektur bei neuen Modulen).
+Order when several run: first deterministic checks (linters, static analysis, tests – via script, not via model), then functional acceptance (standard evaluator), then the focus areas (security → architecture/guidelines → performance → clean code). Each looks at the changes via `git status`/`git diff` and returns concrete, fixable findings to the main agent; the main agent works through them and has it re-checked. Not all of them for every trifle: define in `AGENTS.md` which evaluators run at which scope of change (e.g., security always for auth/inputs/file access; architecture for new modules).
 
-## Vorlage für einen spezialisierten Evaluator
-Datei `.claude/agents/evaluator-<schwerpunkt>.md` (für andere Agenten mit `tools/sync-agents.py` übersetzen):
+## Template for a specialized evaluator
+File `.claude/agents/evaluator-<focus>.md` (translate for other agents with `tools/sync-agents.py`):
 
 ```markdown
 ---
-name: evaluator-sicherheit
+name: evaluator-security
 description: >-
-  Sicherheits-Gutachter (Generator→Evaluator). Nach Änderungen an Authentifizierung,
-  Autorisierung, Eingabeverarbeitung, Datei-/Netzwerkzugriff oder Abhängigkeiten aufrufen,
-  bevor die Arbeit als fertig gilt. Liest Diff und Evidenz mit frischem Kontext, prüft gegen
-  die Sicherheitsregeln in AGENTS.md/docs, antwortet mit PASS oder NEEDS_WORK. Keine Schreibrechte.
+  Security reviewer (generator→evaluator). Call after changes to authentication,
+  authorization, input handling, file/network access, or dependencies, before the work
+  counts as done. Reads diff and evidence with fresh context, checks against the security
+  rules in AGENTS.md/docs, answers with PASS or NEEDS_WORK. No write permissions.
 tools: Read, Glob, Grep, Bash
 model: opus
 ---
 
-Du prüfst Änderungen eines anderen Agenten ausschließlich unter dem Aspekt Sicherheit. Du
-vertraust keiner Behauptung; du bewertest, du reparierst nicht.
+You review another agent's changes exclusively under the aspect of security. You trust
+no claim; you evaluate, you do not repair.
 
-1. `git status` und `git diff` ansehen; betroffene Dateien vollständig lesen.
-2. Prüfen: Eingabevalidierung, Injection (SQL/Shell/Prompt), AuthN/AuthZ, Secrets in Code/Log/
-   Commit, unsichere Defaults, Pfade außerhalb des erlaubten Bereichs, neue Abhängigkeiten,
-   Fehlerbehandlung, die Interna preisgibt. Projektspezifische Regeln: <Pfad zum Dokument>.
-3. Wo möglich selbst beobachten (Tests, Linter, Security-Scanner per Bash).
+1. Look at `git status` and `git diff`; read the affected files in full.
+2. Check: input validation, injection (SQL/shell/prompt), AuthN/AuthZ, secrets in code/log/
+   commit, insecure defaults, paths outside the allowed area, new dependencies,
+   error handling that leaks internals. Project-specific rules: <path to the document>.
+3. Observe for yourself where possible (tests, linters, security scanners via Bash).
 
-Antwort: erste Zeile `PASS` oder `NEEDS_WORK`. Danach je Finding: Datei:Zeile, Risiko,
-erwartetes Verhalten, konkreter Fix-Vorschlag. Blockierende Findings zuerst. Keine Zusammenfassung des Diffs.
+Answer: first line `PASS` or `NEEDS_WORK`. Then per finding: file:line, risk,
+expected behavior, concrete fix proposal. Blocking findings first. No summary of the diff.
 ```
 
-Analog: `evaluator-performance` (Komplexität, N+1, IO im Hot Path, Speicher, Caching/Batching), `evaluator-clean-code` (Lesbarkeit, Benennung, Duplikate, Funktionsgröße, tote Pfade), `evaluator-guidelines` (liest den Guideline-Skill/das Dokument und prüft Punkt für Punkt), `evaluator-architektur` (liest die Architekturdokumentation, prüft Schichtgrenzen, Abhängigkeitsrichtung, Modulzuschnitt). Jeder Schwerpunkt-Evaluator bekommt in `AGENTS.md` einen Satz, wann er läuft.
+Analogously: `evaluator-performance` (complexity, N+1, IO in the hot path, memory, caching/batching), `evaluator-clean-code` (readability, naming, duplicates, function size, dead paths), `evaluator-guidelines` (reads the guideline skill/document and checks point by point), `evaluator-architecture` (reads the architecture documentation, checks layer boundaries, dependency direction, module cut). Every focus evaluator gets one sentence in `AGENTS.md` on when it runs.
 
-## Weitere bewährte Subagent-Typen (zur Orientierung)
-| Typ | Aufgabe |
+## Further proven subagent types (for orientation)
+| Type | Task |
 |---|---|
-| librarian | einziger Zugang zum Wissensspeicher → [wissensablage.md](wissensablage.md) |
-| Doku-Pfleger | vor jedem Commit die Dokumentation nachziehen; Prüfkriterien im Prompt |
-| Remote-System-Experte | beantwortet Fragen zur Produktionsumgebung aus eingelagertem Wissen; ohne Werkzeuge |
-| Verlinkungs-Pattern | statt Custom Subagent: Prompt in einer Datei + Dreizeiler in `AGENTS.md` „starte einen Subagenten, der diese Datei liest" – ohne Dauerkontext |
+| librarian | the only access to the knowledge store → [wissensablage.md](wissensablage.md) |
+| docs updater | update the documentation before every commit; check criteria in the prompt |
+| remote-system expert | answers questions about the production environment from ingested knowledge; without tools |
+| linking pattern | instead of a custom subagent: a prompt in a file + a three-liner in `AGENTS.md` "start a subagent that reads this file" – without standing context |
 
-Custom Subagent = Markdown mit Frontmatter (`name`, `description`, `tools`, `model`, optional `color`) plus Prompt; die `description` entscheidet, ob der Hauptagent ihn einsetzt; `tools` minimal halten; Beschreibungen kosten bei jedem Request Kontext – nur anlegen, was regelmäßig gebraucht wird.
+Custom subagent = Markdown with frontmatter (`name`, `description`, `tools`, `model`, optionally `color`) plus a prompt; the `description` decides whether the main agent uses it; keep `tools` minimal; descriptions cost context on every request – only create what is needed regularly.

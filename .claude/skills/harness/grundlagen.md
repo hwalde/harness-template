@@ -1,38 +1,38 @@
-# Grundlagen: Was ein Harness ist und was ein guter braucht
-**Kern:** Alles außer dem LLM ist der Harness – die Umgebung, in der der Agent läuft: Regeln, Wissen, Werkzeuge, Skripte, Prüfer, Autonomie-Bausteine. Ziel ist immer dieselbe Frage: Wie kann der Agent das selbst und autonom machen? (Kontext: Harness-Template | Stand: 2026-08-30)
+# Fundamentals: what a harness is and what a good one needs
+**Core:** Everything except the LLM is the harness – the environment the agent runs in: rules, knowledge, tools, scripts, reviewers, autonomy building blocks. The goal is always the same question: how can the agent do this itself, autonomously? (Context: harness template | As of: 2026-08-30)
 
-## Begriff
-- Der Coding-Agent selbst ist schon ein Harness (Systemprompt, Werkzeuge, Permission-Modi). Der projektspezifische Harness ist alles, was man darum herum baut, damit Läufe ohne Zutun gut ausgehen: Regeldateien, Subagenten, Skills, MCP-Server, Skripte, Wissensspeicher, Start- und Überwachungsmechanik.
-- Harness Engineering ist die dritte Phase der Arbeit mit Coding-Agenten: Nach „Prompting" und „Prozesse pro Aufgabe planen" kommt die Umgebung, die den Agenten befähigt und prüft – und die Gegenbewegung, ihm das Vorgehen weitgehend zu überlassen: schwieriges Ziel + Prüfkriterium, laufen lassen.
-- Ein Harness wird nie fertig. Er wächst nebenbei: Jeder Satz, den man zum wiederholten Mal tippt, wandert in die Regeldatei; jede Handarbeit, die algorithmisch ist, wird ein Skript; jede wiederkehrende Prüfung ein Evaluator.
+## The term
+- The coding agent itself is already a harness (system prompt, tools, permission modes). The project-specific harness is everything built around it so that runs end well without intervention: rule files, subagents, skills, MCP servers, scripts, knowledge store, launch and monitoring machinery.
+- Harness engineering is the third phase of working with coding agents: after "prompting" and "planning processes per task" comes the environment that enables and checks the agent – and the countermovement of largely leaving the approach to it: a hard goal + check criterion, let it run.
+- A harness is never finished. It grows on the side: every sentence you type for the umpteenth time moves into the rule file; every piece of manual work that is algorithmic becomes a script; every recurring check an evaluator.
 
-## Alle Bausteine dienen demselben Ziel
-Regeldateien, Subagenten, Skills, MCP-Server und Skripte steuern, **welche Informationen und Fähigkeiten wann im Kontextfenster liegen** – das Modell weder über- noch unterfordern. Zwei Erweiterungswege: natürliche Sprache (Regeldateien, Skills, Subagenten) und Algorithmen (Skripte, MCP). Alles, was dauerhaft im Kontext liegt (Beschreibungen von Subagenten, Skills, MCP-Tools, Regeldateien), kostet bei jedem Request – „was will ich dem Modell wirklich die ganze Zeit ins Gesicht halten?"
+## All building blocks serve the same goal
+Rule files, subagents, skills, MCP servers, and scripts control **which information and capabilities sit in the context window when** – neither overtaxing nor undertaxing the model. Two extension paths: natural language (rule files, skills, subagents) and algorithms (scripts, MCP). Everything that sits permanently in the context (descriptions of subagents, skills, MCP tools, rule files) costs on every request – "what do I really want to hold in the model's face all the time?"
 
-## Checkliste: Was ein guter Harness braucht (Auswahl, nicht Pflichtliste)
-| Baustein | Zweck | Im Template |
+## Checklist: what a good harness needs (a selection, not a mandatory list)
+| Building block | Purpose | In the template |
 |---|---|---|
-| Verschriftlichte Anforderungen und Regeln | Kernregeln (Architektur, Workflow, Fallstricke) in `AGENTS.md`, Rest verlinkt | `AGENTS.md`, [regeldateien.md](regeldateien.md) |
-| Evaluator | ein Agent prüft einen Agenten; qualitativ und funktional | `evaluator`, [evaluatoren.md](evaluatoren.md) |
-| Wissensmanagement | der kritischste Punkt: Anforderungen, Pläne, „wie geht was", Zugänge | librarian + `.my-memory/`, [wissensablage.md](wissensablage.md) |
-| Befähigung | der Agent kommt selbst an Informationen, testet und debuggt selbst: Browser-/Desktop-Steuerung, Zugänge, Skripte, Tests | [mcp-und-werkzeuge.md](mcp-und-werkzeuge.md), [skripte.md](skripte.md) |
-| Skripte | deterministische Zuarbeit; Ausgabe als Prompt | `tools/`, [skripte.md](skripte.md) |
-| Nicht vor erledigter Arbeit aufhören | Goal-Befehl oder Loop | [autonome-laeufe.md](autonome-laeufe.md) |
-| Rückfragefreier Modus + Multiplexer | der Lauf hält nie an und überlebt das Ausloggen | `tools/agent-start.py` |
-| Usage-Tracking | vor dem Kontingent-Limit anhalten (nur bei Abo-Limits) | [autonome-laeufe.md](autonome-laeufe.md) |
-| Selbstüberwachung | hängende Skripte und verlaufene Agenten erkennen (Cron/Loop) | [autonome-laeufe.md](autonome-laeufe.md) |
-| Selbstverbesserung (optional) | der Agent schreibt Skills/Doku fort – mit Grenzen | [skills-und-commands.md](skills-und-commands.md) |
-| Sicherheit | Sandbox statt Verbotsliste | [autonome-laeufe.md](autonome-laeufe.md) |
-| Workflow | Docs lesen → planen → arbeiten → prüfen → Docs/Wiki aktualisieren | [workflow.md](workflow.md) |
-| Überbau | Zeitpläne, Worktrees, Überwachung von außen, Merge | [freilauf.md](freilauf.md) |
+| Written-down requirements and rules | core rules (architecture, workflow, pitfalls) in `AGENTS.md`, the rest linked | `AGENTS.md`, [regeldateien.md](regeldateien.md) |
+| Evaluator | one agent checks another; qualitatively and functionally | `evaluator`, [evaluatoren.md](evaluatoren.md) |
+| Knowledge management | the most critical point: requirements, plans, "how does what work", access | librarian + `.my-memory/`, [wissensablage.md](wissensablage.md) |
+| Enablement | the agent obtains information itself, tests and debugs itself: browser/desktop control, access, scripts, tests | [mcp-und-werkzeuge.md](mcp-und-werkzeuge.md), [skripte.md](skripte.md) |
+| Scripts | deterministic support; output as a prompt | `tools/`, [skripte.md](skripte.md) |
+| Not stopping before the work is done | goal command or loop | [autonome-laeufe.md](autonome-laeufe.md) |
+| No-questions mode + multiplexer | the run never halts and survives logging out | `tools/agent-start.py` |
+| Usage tracking | stop before the quota limit (only with subscription limits) | [autonome-laeufe.md](autonome-laeufe.md) |
+| Self-monitoring | detect hanging scripts and lost agents (cron/loop) | [autonome-laeufe.md](autonome-laeufe.md) |
+| Self-improvement (optional) | the agent updates skills/docs – with limits | [skills-und-commands.md](skills-und-commands.md) |
+| Security | sandbox instead of a deny list | [autonome-laeufe.md](autonome-laeufe.md) |
+| Workflow | read docs → plan → work → check → update docs/wiki | [workflow.md](workflow.md) |
+| Superstructure | schedules, worktrees, monitoring from outside, merge | [freilauf.md](freilauf.md) |
 
-Auf die Selbstüberwachung lässt sich am schlechtesten verzichten: Ein Agent, der fünf Minuten nach dem Alleinlassen eine Frage hatte, hat zwei Tage verschenkt. Der Evaluator ist mit dem geringsten Aufwand eingebaut und bringt am meisten.
+Self-monitoring is the hardest to do without: an agent that had a question five minutes after being left alone has thrown away two days. The evaluator is the cheapest to build in and yields the most.
 
-## Befähigung: die eigene rote Linie
-Alles, was der Agent nicht selbst kann, braucht den Menschen. Deshalb: Browser-Steuerung für Web-Apps, Desktop-Steuerung für Desktop-Apps, Zugänge (z. B. ein nur lesendes Postfach, um Bestätigungsmails zu prüfen), Skripte, Tests als Selbstvalidierung. Und bewusst eine rote Linie ziehen – etwa: keine E-Mails ohne menschliche Freigabe, kein Zugriff auf Produktivsysteme ohne Freigabe.
+## Enablement: your own red line
+Everything the agent cannot do itself needs the human. Hence: browser control for web apps, desktop control for desktop apps, access (e.g., a read-only mailbox to check confirmation emails), scripts, tests as self-validation. And deliberately draw a red line – say: no emails without human approval, no access to production systems without approval.
 
-## Ordnung als Architekturvorgabe
-Ein klarer, fachlich geschnittener Ordnerbaum, eindeutige Begriffe (ein Wort pro Konzept) und feste Orte für Skripte, Dokumente und Konfiguration sind Harness-Bausteine: Wie Menschen braucht die KI Struktur, um Informationen schnell zu finden und nichts zu übersehen – und Unterordner-Regeldateien funktionieren nur mit einem fachlichen Schnitt.
+## Order as an architectural requirement
+A clear, domain-cut folder tree, unambiguous terms (one word per concept), and fixed places for scripts, documents, and configuration are harness building blocks: like humans, the AI needs structure to find information quickly and to miss nothing – and subfolder rule files only work with a domain-oriented cut.
 
-## Spec-driven als Ergänzung
-Der hier beschriebene Weg (Ziel + Kriterien + Harness) schließt Spezifikationsdokumente nicht aus: Bei größeren Vorhaben liefert ein Anforderungsdokument mit Umsetzungspaketen und Testing-Anforderungen die Prüfkriterien; bei schwachem Harness bekommt der Agent dort die Zugänge und Hinweise wenigstens für die anstehende Aufgabe ([workflow.md](workflow.md)).
+## Spec-driven as a complement
+The path described here (goal + criteria + harness) does not rule out specification documents: for larger endeavors, a requirements document with implementation packages and testing requirements supplies the check criteria; with a weak harness the agent at least gets the access and hints there for the task at hand ([workflow.md](workflow.md)).

@@ -1,83 +1,83 @@
-# Autonome Läufe: ohne Rückfragen, ohne Anhalten, ohne Aufsicht
-**Kern:** Ein autonomer Lauf scheitert an jeder Nachfrage, die niemand beantwortet, an jeder Session, die beim Ausloggen stirbt, und an jedem Limit, das ihn still abwürgt. Der Harness beseitigt alle drei. (Kontext: Harness-Template | Stand: 2026-08-30)
+# Autonomous runs: without follow-up questions, without stopping, without supervision
+**Core:** An autonomous run fails on every question that nobody answers, on every session that dies at logout, and on every limit that silently chokes it. The harness removes all three. (Context: harness template | As of: 2026-08-30)
 
-## Bausteine im Überblick
-| Baustein | Wozu | Wo im Template |
+## Building blocks at a glance
+| Building block | What for | Where in the template |
 |---|---|---|
-| Rückfragefreier Permission-Modus | der Agent hält nie an, um zu fragen | `tools/agent-start.py` kennt den Modus je Agent |
-| Terminal-Multiplexer (tmux / psmux unter Windows) | Lauf überlebt das Ausloggen; man kann sich anhängen und zuschauen | `tools/agent-start.py start/attach/send` |
-| Zielhierarchie + abhakbare Abnahme-Checkliste im Prompt | der Agent weiß, was Vorrang hat und wann er fertig ist | [workflow.md](workflow.md), unten |
-| Etwas, das ihn nicht vor erledigter Arbeit aufhören lässt | `/goal`-Befehl (Claude Code) bzw. ein Loop | unten |
-| Usage-Tracking | vor dem Kontingent-Limit anhalten statt sterben | Usage-Skript, siehe unten |
-| Selbstüberwachung | hängende Skripte und verlaufene Agenten erkennen | Cron/Loop des Agenten + Prüfskript |
-| Evaluator | die Abnahme prüft ein Zweiter | [evaluatoren.md](evaluatoren.md) |
-| Sandbox | Sicherheit über die Grenze der Umgebung, nicht über Verbotslisten | unten |
-| Überbau für Zeitpläne und Überwachung von außen | wenn Läufe regelmäßig unbeaufsichtigt laufen | [freilauf.md](freilauf.md) |
+| No-questions permission mode | the agent never halts to ask | `tools/agent-start.py` knows the mode per agent |
+| Terminal multiplexer (tmux / psmux on Windows) | the run survives logging out; you can attach and watch | `tools/agent-start.py start/attach/send` |
+| Goal hierarchy + checkable acceptance checklist in the prompt | the agent knows what has priority and when it is done | [workflow.md](workflow.md), below |
+| Something that keeps it from stopping before the work is done | the `/goal` command (Claude Code) or a loop | below |
+| Usage tracking | stop before the quota limit instead of dying | usage script, see below |
+| Self-monitoring | detect hanging scripts and lost agents | the agent's cron/loop + a check script |
+| Evaluator | a second one checks the acceptance | [evaluatoren.md](evaluatoren.md) |
+| Sandbox | security via the boundary of the environment, not via deny lists | below |
+| Superstructure for schedules and monitoring from outside | when runs happen regularly unattended | [freilauf.md](freilauf.md) |
 
-## Permission-Modi (am Beispiel Claude Code; Gegenstücke anderer Agenten in [agenten-kompatibilitaet.md](agenten-kompatibilitaet.md))
-| Modus | Verhalten |
+## Permission modes (using Claude Code as the example; other agents' counterparts in [agenten-kompatibilitaet.md](agenten-kompatibilitaet.md))
+| Mode | Behavior |
 |---|---|
-| manuell | fragt bei jeder Kleinigkeit, darf nicht einmal in Dateien schreiben |
-| acceptEdits | schreibt Dateien im Projektordner ohne Nachfrage; fragt bei Befehlen, außer sie sind freigegeben (dauerhaft erlaubte Befehle merkt er sich) |
-| plan | nur planen, fokussiert auf einen technischen Plan |
-| auto | führt aus, wo er sicher ist, dass der Befehl sicher ist; bei Unsicherheit (z. B. Löschbefehl mit Variablen) fragt er |
-| bypassPermissions | fragt bei Shell-Befehlen nicht; bei wenigen Dingen (eigene Konfigurationsdateien) trotzdem. In Unternehmen unbeliebt – `auto` tut es meist genauso |
-| **dontAsk** | **der Schlüssel zur Autonomie:** fragt nie; nicht Erlaubtes wird still verweigert und dem Modell mitgeteilt, das sich einen anderen Weg sucht. Sperrt alle interaktiven Nachfragewerkzeuge (auch `AskUserQuestion`). Subagenten laufen ohnehin so. Braucht eine Allow-Liste der erlaubten Befehle in den Settings, sonst verweigert er zu viel. |
+| manual | asks about every little thing, may not even write to files |
+| acceptEdits | writes files in the project folder without asking; asks for commands unless they are approved (it remembers permanently allowed commands) |
+| plan | planning only, focused on a technical plan |
+| auto | executes where it is sure the command is safe; when unsure (e.g., a delete command with variables) it asks |
+| bypassPermissions | does not ask for shell commands; for a few things (its own configuration files) it still does. Unpopular in companies – `auto` usually does just as well |
+| **dontAsk** | **the key to autonomy:** never asks; what is not allowed is silently refused and reported to the model, which finds another way. Blocks all interactive question tools (including `AskUserQuestion`). Subagents run like this anyway. Needs an allow list of permitted commands in the settings, otherwise it refuses too much. |
 
-Alternative: `acceptEdits` plus vorab freigegebene Befehle. Bei jedem anderen Agenten das Gegenstück suchen – ohne einen Modus, in dem er nicht mehr fragen *kann*, läuft er nicht wirklich autonom.
+Alternative: `acceptEdits` plus pre-approved commands. For every other agent, look for the counterpart – without a mode in which it *cannot* ask anymore, it does not really run autonomously.
 
-## Sicherheit: Sandbox statt Rechteentzug
-Wer einen Agenten tagelang laufen lässt, will weder, dass er hängen bleibt, noch, dass er seine eigenen Skills nicht bearbeiten darf. Das spricht gegen „möglichst wenig erlauben". Das richtige Konzept: **alles erlauben, dafür in eine Sandbox** (z. B. eine Micro-VM wie die Docker-Sandbox für Coding-Agenten, oder ein Container/Worktree mit begrenztem Netz). Innerhalb der Grenze darf der Agent alles; die Sicherheit kommt aus der Grenze der Umgebung, nicht aus der Länge der Verbotsliste. Ohne Sandbox spielt man mit dem Feuer – dann wenigstens Worktree, Git als Sicherheitsnetz und keine Produktivzugänge.
+## Security: a sandbox instead of stripping permissions
+Whoever lets an agent run for days wants neither it getting stuck nor it being unable to edit its own skills. That speaks against "allow as little as possible". The right concept: **allow everything, but inside a sandbox** (e.g., a micro-VM like the Docker sandbox for coding agents, or a container/worktree with limited network). Inside the boundary the agent may do everything; the security comes from the boundary of the environment, not from the length of the deny list. Without a sandbox you are playing with fire – then at least a worktree, Git as a safety net, and no production access.
 
-## Der Startablauf (bewährte Reihenfolge)
-1. **Prompt schreiben** – kurz, von Hand, präzise. Inhaltlicher Kern ist eine **Zielhierarchie**: Ziel 1, Ziel 2, plus ein ausdrücklicher Satz zur Reihenfolge („wenn Ziel 1 erreicht ist, fahre mit Ziel 2 fort"). Ziele so formulieren, dass er sie rigoros verfolgt, aber erreichbar sind.
-2. **Streichen**, was der Agent ohnehin tut oder was für diesen Lauf keine Rolle spielt („Dokumente aktuell halten", „Learnings notieren" – das steht im Harness). Übrig bleibt der Kern: Ziele, Rahmenbedingungen (Usage, Kosten), Befähigungen.
-3. **Fähigkeit vorgeben, nicht den Einsatzplan:** „Nutze Subagenten" bleibt; „starte pro Fehler einen" wird gestrichen. Eine Vorgabe zum Vorgehen ist nur berechtigt, wenn eine eigene Beobachtung dahintersteht (z. B. „erst ein vollständiger Durchlauf, dann die gesammelten Fehler beheben", weil Neustarts messbar Geld gekostet haben). Die Grenze liegt dort, wo Vorgabe zu Beaufsichtigung wird.
-4. **Meta-Ebenen sauber halten:** Arbeitet das Projekt selbst mit Agenten, gibt es Agenten *im* Projekt und Agenten *des* Coding-Agenten – Wortwahl im Prompt eindeutig halten. Für solche Läufe ein klügeres Modell wählen.
-5. **Formatieren lassen** in einem leeren Chat: „Formatiere diesen Text als Markdown, schreibe nichts um" – den Text in XML-Tags einrahmen, damit Daten und Anweisung getrennt sind.
-6. **Abnahme-Checkliste erzeugen lassen:** „Schreibe die Anforderungen in abhakbarer Form, geordnet nach Ziel 1 und Ziel 2." Jede Formulierung auf zweite Lesarten prüfen („verpflichtende Abhängigkeit" ≠ „verpflichtend zu nutzen") – im Lauf hakt niemand mehr nach.
-7. **Starten** per Skript in einer benannten Session: `python3 tools/agent-start.py start --prompt-file lauf.md --name nachtlauf`. Erster Auftrag an eine neue Instanz bei mehreren Skripten: die Hilfe der Skripte aufrufen und sie verstehen.
-8. **Erst Fragerunde, dann Goal:** „Stelle innerhalb der nächsten zehn Minuten relevante Fragen; danach arbeite vollautonom." Antworten. **Erst danach** das Goal setzen – ein aktives Goal hindert den Agenten daran, für eine Rückfrage anzuhalten. Das Fragewerkzeug beim Namen nennen (verlangen oder verbieten).
-9. **Goal setzen:** Zusammenfassung + Checkliste + Arbeitsweise („vollautonom, keine Fragen, nicht auf Antworten warten"). Token-Länge grob prüfen; den Befehl im Zielfenster frisch eintippen (kopierte Befehle bekommen gern ein Leerzeichen zu viel).
-10. **Loslassen.** Fenster schließen, Session läuft weiter. Nicht ständig hineinschauen – Zuschauen ist der schwierige Teil.
+## The launch sequence (proven order)
+1. **Write the prompt** – short, by hand, precise. The substantive core is a **goal hierarchy**: goal 1, goal 2, plus an explicit sentence on the order ("when goal 1 is reached, continue with goal 2"). Phrase the goals so that it pursues them rigorously, but keep them attainable.
+2. **Cut** what the agent does anyway or what plays no role for this run ("keep documents up to date", "note learnings" – that lives in the harness). What remains is the core: goals, framework conditions (usage, costs), enablements.
+3. **Prescribe capability, not the deployment plan:** "use subagents" stays; "start one per bug" gets cut. A prescription about the approach is only justified if your own observation stands behind it (e.g., "first one complete pass, then fix the collected errors", because restarts measurably cost money). The line lies where prescription becomes supervision.
+4. **Keep meta-levels clean:** if the project itself works with agents, there are agents *in* the project and agents *of* the coding agent – keep the wording in the prompt unambiguous. Choose a smarter model for such runs.
+5. **Have it formatted** in an empty chat: "Format this text as Markdown, do not rewrite anything" – frame the text in XML tags so that data and instruction stay separate.
+6. **Have an acceptance checklist generated:** "Write the requirements in checkable form, ordered by goal 1 and goal 2." Check every phrase for second readings ("mandatory dependency" ≠ "mandatory to use") – during the run nobody asks follow-up questions anymore.
+7. **Start** via script in a named session: `python3 tools/agent-start.py start --prompt-file lauf.md --name nachtlauf`. The first assignment for a new instance when there are several scripts: call up the scripts' help and understand them.
+8. **Question round first, then goal:** "Ask relevant questions within the next ten minutes; after that, work fully autonomously." Answer them. **Only then** set the goal – an active goal keeps the agent from halting for a follow-up question. Name the question tool explicitly (demand or forbid it).
+9. **Set the goal:** summary + checklist + working mode ("fully autonomous, no questions, do not wait for answers"). Roughly check the token length; type the command fresh in the target window (copied commands like to pick up one space too many).
+10. **Let go.** Close the window, the session keeps running. Do not look in constantly – watching is the hard part.
 
-## Nicht vor erledigter Arbeit aufhören
-- Claude Code: `/goal` – Bedingungen in abhakbarer Form; der Agent bricht nicht ab, bevor sie erfüllt sind (endlos läuft er trotzdem nicht).
-- Alternativ ein Loop, der den Agenten mit derselben Aufgabe neu startet, bis ein Prüfskript „fertig" meldet (vorsichtig: Loops ohne Abbruchkriterium und ohne Usage-Prüfung sind gefährlich).
-- Große Ziele: ausführlich im normalen Chat beschreiben, in das Goal nur die zu erfüllenden Bedingungen setzen.
+## Not stopping before the work is done
+- Claude Code: `/goal` – conditions in checkable form; the agent does not abort before they are met (it still does not run endlessly).
+- Alternatively a loop that restarts the agent with the same task until a check script reports "done" (careful: loops without an abort criterion and without a usage check are dangerous).
+- Large goals: describe them at length in the normal chat, put only the conditions to be met into the goal.
 
-## Usage-Tracking (nur bei Abo-Kontingenten relevant)
-- Ein Session-Fenster (z. B. 5 Stunden) plus Wochen- und Modell-Limits. Bei 100 % ist der Lauf faktisch tot: Subagenten sterben oder hängen; einziger Ausweg wäre zusätzliches, teures Extra-Kontingent.
-- Lösung: ein **Usage-Skript**, das Prozentwert und Reset-Zeitpunkt zurückgibt (Datenquelle je Agent verschieden – bei Claude Code z. B. die Statusline-/Quota-Daten im Konfigurationsordner; sonst der Kontingent-Befehl des Agenten oder die Provider-API). Ausgabe menschenlesbar, für Wrapper zusätzlich eine byte-stabile Schlusszeile.
-- Anweisungen im Prompt: das Skript nutzen; Prüfintervall verkürzen, je näher der Wert an 90 % rückt; über 90 % bis zum Reset warten; **Subagenten pausieren und prüfen ihr Usage selbst mit demselben Skript** – ein Subagent, der nichts vom Limit weiß, verbraucht das Budget des Hauptagenten ungebremst.
-- **Kosten getrennt tracken** (API-Kosten ≠ Kontingent).
+## Usage tracking (only relevant with subscription quotas)
+- A session window (e.g., 5 hours) plus weekly and model limits. At 100% the run is effectively dead: subagents die or hang; the only way out would be additional, expensive extra quota.
+- Solution: a **usage script** that returns the percentage and the reset time (the data source differs per agent – for Claude Code e.g. the status-line/quota data in the configuration folder; otherwise the agent's quota command or the provider API). Output human-readable, plus a byte-stable final line for wrappers.
+- Instructions in the prompt: use the script; shorten the check interval the closer the value gets to 90%; above 90% wait until the reset; **subagents pause and check their usage themselves with the same script** – a subagent that knows nothing about the limit burns the main agent's budget unchecked.
+- **Track costs separately** (API costs ≠ quota).
 
-## Selbstüberwachung
-- Lang laufende Skripte hängen manchmal; Agenten verlaufen sich. Es braucht jemanden, der von Zeit zu Zeit hinschaut, wenn niemand vor dem Bildschirm sitzt.
-- Der Agent legt sich die Überwachung selbst an: bei Claude Code per `CronCreate`-Tool bzw. `/loop` („lege dir mit deinem CronCreate-Tool einen Job an, der alle 30 Minuten `tools/watch.py` ausführt"). Werkzeug beim Namen nennen, damit aus dem Cron-Tool kein Chrome-Tool wird; mit einer trivialen Aufgabe (minütlich „Hallo Welt") vorher testen, danach den Job wieder löschen.
-- Was der Job prüft: laufen die Prozesse noch, gibt es Fortschritt, läuft die Platte voll, hängt ein Skript, ist ein Subagent ohne Ergebnis stehen geblieben. Bei Befund: eingreifen oder den Lauf neu anstoßen.
-- Für Überwachung von außen (auch bei Rate-Limits, die der Agent selbst nicht mehr melden kann) und Zeitpläne: [freilauf.md](freilauf.md).
+## Self-monitoring
+- Long-running scripts sometimes hang; agents get lost. Someone is needed who looks in from time to time when nobody sits in front of the screen.
+- The agent sets up the monitoring for itself: in Claude Code via the `CronCreate` tool or `/loop` ("use your CronCreate tool to create a job that runs `tools/watch.py` every 30 minutes"). Name the tool explicitly so that the cron tool does not become a Chrome tool; test beforehand with a trivial task (a "hello world" every minute), then delete the job again.
+- What the job checks: are the processes still running, is there progress, is the disk filling up, is a script hanging, has a subagent stalled without a result. On a finding: intervene or restart the run.
+- For monitoring from outside (including rate limits the agent itself can no longer report) and schedules: [freilauf.md](freilauf.md).
 
-## Verhalten für Unvorhergesehenes: Boundaries und Abbruchbedingungen
-Modelle wollen ihr Ziel erreichen und nehmen den kürzesten Weg – im Normalfall die eingebaute Bremse, unter Zieldruck („denke out of the box") aber auch der Grund für unerwünschte Wege. Wer autonom laufen lässt, gibt deshalb ein Verhalten für unvorhergesehene Situationen mit:
-- **Harte Grenzen:** „Nur die Controller migrieren, sonst nichts." „Keine Änderungen außerhalb von `src/api/`." „Keine E-Mails, keine Deployments, keine Produktivsysteme." Sonst schreibt der Agent das halbe System um, weil „dann muss auch das und das".
-- **Abbruchbedingung:** „Stellst du fest, dass du außerhalb von X etwas ändern müsstest, hör auf und schreib auf, was fehlt."
-- **Bei Zeit:** die ersten Fälle gemeinsam, die nächsten allein, bei Erfolg alle.
-- **Tests glattziehen ohne Bugs zu kaschieren:** „Zieh die Tests glatt, die wegen der Codeänderung brechen; findest du dabei einen Bug, kaschiere ihn nicht, sondern schreib ihn auf." Ohne den Zusatz werden Tests grün und Fehler verschwinden.
-- Grobe Ziele haben Kanten: „Pipeline debuggen" braucht den Satz „gefixte Bugs aus der Bug-Liste entfernen", sonst wächst die Liste endlos.
-- Loops (Agent wird mit derselben Aufgabe neu gestartet) nur mit Abbruchkriterium und Usage-Prüfung.
+## Behavior for the unforeseen: boundaries and abort conditions
+Models want to reach their goal and take the shortest path – normally the built-in brake, but under goal pressure ("think out of the box") also the reason for unwanted paths. Whoever runs autonomously therefore hands over behavior for unforeseen situations:
+- **Hard boundaries:** "Migrate only the controllers, nothing else." "No changes outside `src/api/`." "No emails, no deployments, no production systems." Otherwise the agent rewrites half the system because "then this and that must change too".
+- **Abort condition:** "If you find that you would need to change something outside X, stop and write down what is missing."
+- **Given time:** the first cases together, the next alone, on success all of them.
+- **Straighten tests without papering over bugs:** "Straighten the tests that break because of the code change; if you find a bug doing so, do not paper over it, write it down." Without that addition, tests turn green and errors vanish.
+- Rough goals have edges: "debug the pipeline" needs the sentence "remove fixed bugs from the bug list", otherwise the list grows endlessly.
+- Loops (the agent restarted with the same task) only with an abort criterion and a usage check.
 
-## Steuern ohne zu stören
-- Direkt in den Chat getippte Hinweise ändern den Kontext und wirken auf alles Folgende – so steuert man absichtlich (Steering). Mitten im Lauf „benutze jetzt den librarian" ist dagegen sinnlos; angebotene Werkzeuge werden in autonomen Läufen seltener genutzt als erwartet.
-- Stille Diagnose: Der ganze Verlauf plus eine Frage an ein zweites Modell (Claude Code: `/by the way`) beantwortet „wo steht er?", ohne dass der Agent etwas merkt. Muster: still diagnostizieren → Problem außerhalb des Laufs beheben → nur die eine nötige Information in den Chat.
-- Verläuft sich der Hauptagent in Detailarbeit: „Starte dafür lieber einen Subagenten, damit du dich nicht ablenken lässt." Bei langen Läufen gleich am Anfang: „Du orchestrierst nur; Subagenten setzen um – so schützt du dein Kontextfenster."
-- Modell und Reasoning-Aufwand sind keine Einmal-Einstellungen: Für Zwischenaufgaben ohne Denkbedarf ein kleineres Modell und niedrigeren Effort; für Läufe, in denen Meta-Ebenen und Werkzeuge verstanden werden müssen, das klügste Modell.
+## Steering without disturbing
+- Hints typed directly into the chat change the context and affect everything that follows – that is how you steer deliberately (steering). Mid-run "use the librarian now", however, is pointless; offered tools are used less in autonomous runs than expected.
+- Silent diagnosis: the whole transcript plus one question to a second model (Claude Code: `/by the way`) answers "where is it standing?" without the agent noticing anything. Pattern: diagnose silently → fix the problem outside the run → put only the one needed piece of information into the chat.
+- If the main agent gets lost in detail work: "Better start a subagent for that, so you don't get distracted." For long runs, right at the start: "You only orchestrate; subagents implement – that protects your context window."
+- Model and reasoning effort are not one-time settings: for interim tasks without thinking demand a smaller model and lower effort; for runs in which meta-levels and tools must be understood, the smartest model.
 
-## Selbstverbesserung (optional)
-Der Agent darf den Skill, aus dem er das Wissen zur Weiterentwicklung des Systems zieht, mit **relevanten** Learnings fortschreiben. Risiko: Er optimiert den Skill kaputt und wirft Kernentscheidungen über Bord. Gegenmittel: nicht verhandelbare Entscheidungen im Skill als solche markieren; „mit den relevanten Learnings", nicht „mit allen". Ein Rest bleibt Kontrollabgabe.
+## Self-improvement (optional)
+The agent may extend the skill from which it draws the knowledge for evolving the system with **relevant** learnings. Risk: it optimizes the skill to pieces and throws core decisions overboard. Countermeasure: mark non-negotiable decisions in the skill as such; "with the relevant learnings", not "with all". A remainder stays surrendered control.
 
-## Verifikation ans Ende verlagern
-Manche Ergebnisse kann nur ein Mensch abnehmen. Dann lohnt es sich, die Endabnahme verlässlich ans Ende zu legen (z. B. eine Kommentarfunktion mit Zeitmarke, deren Rückmeldung der Agent gezielt abarbeitet) und unterwegs nicht jede Kleinigkeit per Screenshot prüfen zu lassen – laufende Zwischenprüfung ist teuer, Edge Cases sind beim Menschen am Ende besser aufgehoben.
+## Shifting verification to the end
+Some results only a human can accept. Then it pays to place the final acceptance reliably at the end (e.g., a comment function with timestamps whose feedback the agent works through in a targeted way) and not have every little thing checked by screenshot along the way – continuous interim checking is expensive, and edge cases are better left to the human at the end.
 
-## `tools/agent-start.py` in Kürze
-`doctor` (welche Agenten/Multiplexer da sind) · `start --prompt/--prompt-file [--agent] [--name] [--dir] [--model] [--headless] [--attach] [--dry-run]` · `list` · `attach NAME` · `send NAME "Text"` · `kill NAME`. Mit Multiplexer entsteht eine interaktive Session `hx-<name>`; ohne (oder mit `--headless`) läuft der Agent im Hintergrund mit Log unter `.harness/runs/`. Die Flags je Agent stehen in einer Tabelle am Anfang des Skripts – der einzige Ort, der bei Flag-Änderungen anzupassen ist.
+## `tools/agent-start.py` in brief
+`doctor` (which agents/multiplexers are there) · `start --prompt/--prompt-file [--agent] [--name] [--dir] [--model] [--headless] [--attach] [--dry-run]` · `list` · `attach NAME` · `send NAME "Text"` · `kill NAME`. With a multiplexer an interactive session `hx-<name>` is created; without one (or with `--headless`) the agent runs in the background with a log under `.harness/runs/`. The flags per agent live in a table at the top of the script – the only place to adjust when flags change.

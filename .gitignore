@@ -1,11 +1,11 @@
-# Betriebssystem / IDE
+# Operating system / IDE
 .DS_Store
 Thumbs.db
 .idea/
 *.iml
 .vscode/
 
-# Lokale, maschinenspezifische Agent-Konfiguration – nie committen
+# Local, machine-specific agent configuration - never commit
 CLAUDE.local.md
 .claude/settings.local.json
 .mcp.local.json
@@ -14,11 +14,11 @@ CLAUDE.local.md
 *.pem
 *.key
 
-# Laufzeit-Artefakte des Harness
+# Runtime artifacts of the harness
 .harness/runs/
 .playwright-mcp/
 
-# Von opencode selbst angelegt (Plugin-Abhängigkeiten)
+# Created by opencode itself (plugin dependencies)
 .opencode/node_modules/
 .opencode/package.json
 .opencode/package-lock.json

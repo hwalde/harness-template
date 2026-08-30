@@ -1,56 +1,56 @@
-# Workflow: vom Auftrag zur abgenommenen Arbeit
-**Kern:** Ein Standard-Workflow in `AGENTS.md` legt die Reihenfolge fest: Vorwissen holen → planen (so viel wie nötig) → umsetzen mit deterministischen Prüfungen → Evaluator-Schleife → Dokumentation und Wiki nachziehen. Der Gegenpol zu viel Planung ist ein knappes Ziel mit Prüfkriterium. (Kontext: Harness-Template | Stand: 2026-08-30)
+# Workflow: from assignment to accepted work
+**Core:** A standard workflow in `AGENTS.md` fixes the order: gather prior knowledge → plan (as much as needed) → implement with deterministic checks → evaluator loop → update documentation and wiki. The counterpole to a lot of planning is a terse goal with a check criterion. (Context: harness template | As of: 2026-08-30)
 
-## Der Standard-Workflow (Vorschlag für `AGENTS.md`, bei der Einrichtung zuschneiden)
-1. **Vorwissen:** librarian ABFRAGE mit der Intention; verlinkte Dokumente lesen, die das Thema berühren (Unterordner-Regeldateien lädt der Agent situativ).
-2. **Planen, so viel wie nötig** (Stufen unten). Akzeptanzkriterien abhakbar aufschreiben – sie sind der Maßstab des Evaluators.
-3. **Umsetzen.** Deterministisches per Skript: Formatierung, Linter, statische Analyse, Tests, Build. Bei Web-/Desktop-Apps zwischendurch selbst nachsehen (Browser-/Desktop-Steuerung), am Ende wiederholbare Tests laufen lassen.
-4. **Abnahme:** evaluator mit Kriterien, Diff und Evidenz; bei `NEEDS_WORK` nacharbeiten und erneut prüfen, bis `PASS`. Schwerpunkt-Evaluatoren nach Änderungsumfang ([evaluatoren.md](evaluatoren.md)).
-5. **Nachziehen:** Dokumentation/Spezifikation aktualisieren; Bleibendes über den librarian einlagern (nur was eine zukünftige Session braucht); ein Satz in `AGENTS.md`, wenn er zum wiederholten Mal nötig war; Release/Deploy nur über das dafür festgelegte Skript.
+## The standard workflow (a suggestion for `AGENTS.md`, tailor during setup)
+1. **Prior knowledge:** librarian QUERY with the intention; read linked documents that touch the topic (subfolder rule files the agent loads situationally).
+2. **Plan as much as needed** (levels below). Write acceptance criteria in checkable form – they are the evaluator's yardstick.
+3. **Implement.** The deterministic via script: formatting, linters, static analysis, tests, build. For web/desktop apps look for yourself in between (browser/desktop control), at the end run repeatable tests.
+4. **Acceptance:** evaluator with criteria, diff, and evidence; on `NEEDS_WORK` rework and re-check until `PASS`. Focus evaluators by scope of change ([evaluatoren.md](evaluatoren.md)).
+5. **Follow-up:** update documentation/specification; ingest the lasting via the librarian (only what a future session needs); one sentence in `AGENTS.md` when it was needed for the umpteenth time; release/deploy only via the script designated for it.
 
-Das ist die Reihenfolge, nicht ein Formular: Ein Ein-Zeilen-Fix braucht keinen Plan, aber jede Änderung braucht die Abnahme.
+That is the order, not a form: a one-line fix needs no plan, but every change needs the acceptance.
 
-## Wie viel Planung eine Aufgabe braucht
-| Stufe | Wann | Vorgehen |
+## How much planning a task needs
+| Level | When | Approach |
 |---|---|---|
-| 1 – machen lassen | nicht kompliziert (Button umfärben, kleiner Fix) | direkt aus dem Chat umsetzen; deckt heute die meisten Fälle |
-| 1+ – planen lassen | etwas mehr Struktur gewünscht | Planungsmodus des Agenten → technischer Plan → umsetzen |
-| 2 – Plan in Datei | Stufe 1 trägt nicht; Kontext soll frisch sein | Plan in Datei schreiben lassen, dann **2–4 Korrekturschleifen** („geh noch einmal durch den Verlauf, fehlt etwas für die Umsetzung?") – beim ersten Nachfragen kommt immer Wesentliches nach; Umsetzung in neuem Chat nur mit dem Plan |
-| 3 – Anforderungsdokument | wirklich groß; ein technischer Plan wird zum Klotz (ab ~800 Zeilen gut, 4000 schlecht) | fachliche Anforderungen mit Schlüsselnummern (was, nicht in welcher Datei) + Umsetzungspakete (jede Anforderung mindestens einem Paket zugeordnet – Korrekturschleife) + **Testinganforderungen je Paket** + bei schwachem Harness Testing-Informationen (nutzbare Werkzeuge, API-Doku, MCP-Server). Zwei Zusatzanforderungen je Paket: nach der Umsetzung das Dokument erneut lesen und abhaken; knappe Implementierungshinweise für Folgepakete nachtragen. Ein Chat oder Subagent je Paket |
+| 1 – just let it do | not complicated (recolor a button, a small fix) | implement straight from the chat; covers most cases today |
+| 1+ – let it plan | a bit more structure desired | the agent's planning mode → technical plan → implement |
+| 2 – plan in a file | level 1 does not carry; the context should be fresh | have the plan written to a file, then **2–4 correction loops** ("go through the transcript once more – is anything missing for the implementation?") – on the first follow-up something essential always surfaces; implementation in a new chat with only the plan |
+| 3 – requirements document | genuinely large; a technical plan becomes dead weight (fine at ~800 lines, bad at 4000) | domain requirements with key numbers (what, not in which file) + implementation packages (every requirement assigned to at least one package – correction loop) + **testing requirements per package** + with a weak harness testing information (usable tools, API docs, MCP servers). Two extra requirements per package: after implementation, reread the document and check off; add terse implementation notes for subsequent packages. One chat or subagent per package |
 
-Daraus der Zyklus **Dokument lesen → arbeiten → Dokument aktualisieren**: Das Anforderungs- bzw. Plandokument bleibt die fortgeschriebene Wissensquelle für den nächsten Chat oder Subagenten.
+From this the cycle **read document → work → update document**: the requirements or plan document remains the continuously updated knowledge source for the next chat or subagent.
 
-**Gegenpol (bevorzugt, wo möglich):** Ziel + Prüfkriterium statt Ablaufplan. „Die Pipeline soll unter 10 Dollar kosten; prüfe das über die Kostenabfrage bei X." Die Prompt-Arbeit verschwindet nicht, sie wandert vom Vorgehen ins Ziel und ins Kriterium ([autonome-laeufe.md](autonome-laeufe.md)). Frameworks, die Anforderungen abfragen (Spec-Kit-artige), sind Stützräder – nützlich, solange man ungeübt ist.
+**Counterpole (preferred where possible):** goal + check criterion instead of a process plan. "The pipeline must cost under 10 dollars; check that via the cost query at X." The prompt work does not disappear, it moves from the procedure into the goal and the criterion ([autonome-laeufe.md](autonome-laeufe.md)). Frameworks that elicit requirements (Spec-Kit-like) are training wheels – useful as long as you are unpracticed.
 
-**Pre-Workflow:** Ticket + Braindump (alles, was der Agent nicht wissen kann: Meetings, Richtung, Bedenken, eigene Fragen) → 3–8 Subagenten parallel als Informationsbeschaffer („wie haben wir X gebaut, wäre ein Refactoring nötig?") → Lösungswege vom Agenten kommen lassen, Mensch entscheidet. Der Chat ist dann „eine Müllhalde mit Perlen"; ab Stufe 2 werden nur die Perlen weitergegeben.
+**Pre-workflow:** ticket + braindump (everything the agent cannot know: meetings, direction, concerns, your own questions) → 3–8 subagents in parallel as information gatherers ("how did we build X, would a refactoring be needed?") → have the agent propose solution paths, the human decides. The chat is then "a garbage dump with pearls"; from level 2 on, only the pearls are passed on.
 
-## Testen im Workflow
-- Die Testpyramide bleibt. Tests sind mit KI wertvoller als vorher, weil der Agent damit sein eigenes Ergebnis validiert; E2E-Tests am Ende, gern schon am Anfang geschrieben; bei Parser-artigen Aufgaben Input/Output-Paare vorgeben („bau dir daraus Unit-Tests").
-- Kein manuelles Testdrehbuch zum Durchspielen geben – daraus wiederholbare E2E-Tests generieren lassen (Durchklicken ist tagesformabhängig).
-- Browser-/Desktop-Steuerung ist zum Nachsehen zwischendurch da, nicht zum Testen; deterministische Zustandsprüfungen (Server läuft? Port? Health? Log?) sind Skripte.
-- Testergebnisse für den Agenten aufbereiten (Skript: fehlgeschlagene Tests einzeln wiederholen, Browser-Log/Netzwerk/Server-Log je Test, Alter der Einträge) – Agenten haben kein Zeitgefühl.
-- Nach Umbauten: „Tests glattziehen; findest du einen Bug, kaschiere ihn nicht, sondern schreib ihn auf."
-- Menschliche Endabnahme bleibt, wo es um menschlich-optische Beurteilung geht (Sinnhaftigkeit von Oberflächen, Spezialsoftware, Video). Sie ans Ende legen und den Agenten unterwegs nicht jeden Edge Case per Screenshot prüfen lassen.
+## Testing in the workflow
+- The test pyramid stays. Tests are more valuable with AI than before, because the agent validates its own result with them; E2E tests at the end, happily written already at the start; for parser-like tasks provide input/output pairs ("build yourself unit tests from these").
+- Do not hand over a manual test playbook to be played through – have repeatable E2E tests generated from it (clicking through depends on the day's form).
+- Browser/desktop control is for looking in between, not for testing; deterministic state checks (server running? port? health? log?) are scripts.
+- Prepare test results for the agent (script: repeat failed tests individually, browser log/network/server log per test, age of the entries) – agents have no sense of time.
+- After restructurings: "Straighten the tests; if you find a bug, do not paper over it, write it down."
+- Human final acceptance remains where human-visual judgment matters (the sensibleness of user interfaces, special software, video). Place it at the end and do not have the agent check every edge case by screenshot along the way.
 
-## Aufträge formulieren (Kurzfassung)
-- Kristallklar, sachlich; das **Warum** und das Qualitätsniveau mitgeben (Prototyp für eine Demo vs. Produktivsystem).
-- Kontext: hineinschreiben, holen lassen (und sagen wo) oder – Harness – selbst holen lassen.
-- Beispiele sparsam bei Spitzenmodellen (Quelltext ist das Beispiel: „wie der User-Service"); reichlich bei kleinen Modellen.
-- Vorgehen nur vorgeben, wenn eine eigene Beobachtung dahintersteht; sonst Fähigkeit nennen („nutze Subagenten") und Einsatz überlassen.
-- Verhalten für Unvorhergesehenes: Grenzen und Abbruchbedingungen ([autonome-laeufe.md](autonome-laeufe.md)).
-- Werkzeuge beim Namen nennen (verlangen oder verbieten); Aktionen nach außen begrenzen („ausfüllen, nicht abschicken").
-- Fremden Text in XML-Tags einrahmen; „formatiere, schreibe nicht um"; „eins zu eins in eine Datei schreiben".
-- Aufträge an andere Instanzen/Subagenten als **Brief**, nicht als Befehlsliste: „Bedenke, dass die Instanz dasselbe Modell ist wie du und sich vollständig damit auseinandersetzen wird – lass ihr Raum zum Denken."
-- Drei Kontrollfragen: „Gib in deinen Worten wieder, was ich gesagt habe." · „Gibt es noch offene, **relevante** Fragen?" · nach Überplanung: „Gibt es Widersprüche?"
-- Zahlen statt Adjektive für Umfang; Textmengen misst ein Skript.
+## Phrasing assignments (short version)
+- Crystal clear, factual; include the **why** and the quality level (a prototype for a demo vs. a production system).
+- Context: write it in, have it fetched (and say where), or – harness – have it fetch it itself.
+- Examples sparingly with top models (the source code is the example: "like the user service"); plentifully with small models.
+- Prescribe the approach only when your own observation stands behind it; otherwise name the capability ("use subagents") and leave the deployment to it.
+- Behavior for the unforeseen: boundaries and abort conditions ([autonome-laeufe.md](autonome-laeufe.md)).
+- Name tools explicitly (demand or forbid); limit outward actions ("fill in, do not submit").
+- Frame third-party text in XML tags; "format, do not rewrite"; "write one to one into a file".
+- Assignments to other instances/subagents as a **letter**, not a list of commands: "Consider that the instance is the same model as you and will fully engage with this – leave it room to think."
+- Three control questions: "Restate in your own words what I said." · "Are there open, **relevant** questions?" · after overplanning: "Are there contradictions?"
+- Numbers instead of adjectives for scope; text volume is measured by a script.
 
-## Rückfragen-Politik
-Bei der Einrichtung festlegen: interaktiv (Rückfragen erlaubt, bevorzugt gebündelt und mit dem Fragewerkzeug des Agenten) oder vollautonom (keine Rückfragen außer auf Aufforderung; beste begründete Annahme treffen, dokumentieren, weiterarbeiten; Fragerunde nur vor dem Start). Für unbeaufsichtigte Läufe gilt immer Letzteres.
+## Follow-up-question policy
+Decide during setup: interactive (follow-up questions allowed, preferably bundled and with the agent's question tool) or fully autonomous (no follow-up questions except on demand; make the best justified assumption, document it, keep working; a question round only before the start). For unattended runs, the latter always applies.
 
-## Dynamic Workflows und Evaluator-Ketten
-- Normal: Hauptagent startet Subagent → liest Report → denkt → nächster. Ein **Dynamic Workflow** (Claude Code: Workflow-Skript) spart das Dazwischen: Der Hauptagent schreibt ein Skript aus Subagent-Aufrufen (je Modell, Typ, Prompt, Ausgabeschema), führt es aus, bekommt am Ende einen Report; Ergebnisse fließen als Text in den nächsten Prompt. Vorteil: kein Nachdenken zwischen den Schritten; Nachteil: genau das fehlt. Nur mit ausdrücklicher Zustimmung des Benutzers – viele Agenten, viele Tokens.
-- Mehrere Evaluatoren nacheinander lassen sich so als Kette abbilden (Findings des einen im Prompt des nächsten) oder schlicht sequenziell vom Hauptagenten aufrufen.
-- Hauptagent als Manager: bei langen Läufen orchestriert er nur; Subagenten setzen um. Schwärme mit Rollen und Kommunikationsregeln haben sich nicht bewährt.
+## Dynamic workflows and evaluator chains
+- Normal: the main agent starts a subagent → reads the report → thinks → the next one. A **dynamic workflow** (Claude Code: workflow script) saves the in-between: the main agent writes a script of subagent calls (each with model, type, prompt, output schema), executes it, gets a report at the end; results flow as text into the next prompt. Advantage: no thinking between the steps; disadvantage: exactly that is missing. Only with the user's explicit consent – many agents, many tokens.
+- Several evaluators in sequence can be modeled this way as a chain (one's findings in the next one's prompt) or simply called sequentially by the main agent.
+- The main agent as manager: on long runs it only orchestrates; subagents implement. Swarms with roles and communication rules have not proven themselves.
 
-## Der Harness wächst nebenbei
-Jeder Satz, den man zum zweiten Mal tippt, wird eine Regel; jede Handarbeit, die algorithmisch ist, ein Skript; jede wiederkehrende Prüfung ein Evaluator; jeder gelungene Ablauf ein Skill („Gibt es Teile, die wir als Skill wiederverwenden sollten?").
+## The harness grows on the side
+Every sentence you type for the second time becomes a rule; every piece of manual work that is algorithmic becomes a script; every recurring check an evaluator; every successful procedure a skill ("Are there parts we should reuse as a skill?").

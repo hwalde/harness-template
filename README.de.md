@@ -27,7 +27,7 @@ tools/sync-agents.py       Subagenten-Definitionen in andere Formate übersetzen
 
 **evaluator** – prüft mit frischem Kontext und ohne Schreibrechte gegen Spezifikation, Diff und Evidenz; antwortet `PASS` oder `NEEDS_WORK`. Optional mit Schwerpunkt (Sicherheit, Performance, Clean Code, Guidelines, Architektur).
 **librarian** – einziger Zugang zum Projektgedächtnis; filtert, was bleibt (Entscheidungen samt Begründung, Fallstricke, Betriebswissen) und weist Grundrauschen ab.
-**Harness-Skill** – zwölf kurze Dokumente: die geführte Einrichtung, was ein Harness braucht, Regeldateien, Wissensablage und ihre Alternativen, Evaluatoren, Skills, wann MCP und wann Skript, die zehn Prinzipien für agentenfreundliche Skripte, autonome Läufe, Workflow, Kompatibilität der Agenten, freilauf.
+**Harness-Skill** – zwölf kurze Dokumente: die geführte Einrichtung, was ein Harness braucht, Regeldateien, Wissensablage und ihre Alternativen, Evaluatoren, Skills, wann MCP und wann Skript, die zehn Prinzipien für agentenfreundliche Skripte, autonome Läufe, Workflow, Kompatibilität der Agenten, freilauf. Daneben `MEMORY.md`, die den Zustand deines Harness festhält: Einrichtungsstand, eingesetzte Agenten, Entscheidungen samt Begründung, offene Punkte.
 
 ## Schnellstart
 
@@ -43,7 +43,7 @@ Claude Code läuft out of the box. Für opencode werden die Subagenten generiert
 
 ## Sprachen
 
-Nur was Menschen lesen, ist dreisprachig: diese READMEs (EN/ZH/DE). Die Harness-Dateien selbst (`AGENTS.md`, Subagenten, Skill) liegen in einer Fassung auf Deutsch – Coding-Agenten lesen sie unabhängig von deiner Sprache, und eine einzige Fassung bedeutet keinen Übersetzungs-Sync. Wer sie lieber in der eigenen Sprache hätte: Schritt 0 der Einrichtung lässt den Agenten sie einmalig übersetzen. Die Skripte in `tools/` sprechen Englisch (Quellcode-Sprache).
+Nur was Menschen lesen, ist dreisprachig: diese READMEs (EN/ZH/DE). Alles Technische – `AGENTS.md`, die Subagenten, der Skill, das Wiki-Skelett und die Skripte in `tools/` – ist einsprachig Englisch: Coding-Agenten lesen es unabhängig von deiner Sprache, und eine einzige Fassung bedeutet keinen Übersetzungs-Sync. Wer die Harness-Dateien lieber in der eigenen Sprache hätte: Schritt 0 der Einrichtung lässt den Agenten sie einmalig an Ort und Stelle übersetzen.
 
 ## freilauf: der Überbau
 

@@ -1,71 +1,66 @@
-# AGENTS.md – Regeln für Coding-Agenten in diesem Projekt
+# AGENTS.md – Rules for coding agents in this project
 
-Dieses Projekt wurde aus dem Harness-Template erstellt (https://github.com/hwalde/harness-template). Alles Projektwissen für Agenten steht hier; `CLAUDE.md` enthält nur `@AGENTS.md`.
+This project was created from the harness template (https://github.com/hwalde/harness-template). All project knowledge for agents lives here; `CLAUDE.md` contains only `@AGENTS.md`.
 
-## Harness einrichten (diesen Absatz nach der Einrichtung löschen)
+## Setting up the harness (delete this paragraph after setup)
 
-Schlage dem Benutzer vor, diesen Harness gemeinsam mit ihm einzurichten. Lade dafür den Skill `harness` (ist er nicht ladbar, lies `.claude/skills/harness/SKILL.md`), lies ALLE dort katalogisierten Dokumente und folge dann `einrichtung.md`. Sobald die Einrichtung abgeschlossen ist, lösche diesen Absatz aus der AGENTS.md, damit dem Benutzer die Einrichtung nicht erneut vorgeschlagen wird.
+Suggest to the user that you set up this harness together with them. To do so, load the skill `harness` (if it cannot be loaded, read `.claude/skills/harness/SKILL.md`), read ALL documents cataloged there, and then follow `einrichtung.md`. As soon as setup is complete, delete this paragraph from AGENTS.md so the user is not offered the setup again.
 
-## Harness-Wissen
+## Harness knowledge
 
-Wenn dich der Benutzer etwas zu diesem Harness hier fragt oder den Harness verbessern oder einrichten möchte, lade den Skill `harness`; ist der Skill nicht ladbar, lies stattdessen `.claude/skills/harness/SKILL.md` und die dort verlinkte `index.md`. Halbwissen ist gefährlich: Lies die Dokumente, die dein Thema berühren, vollständig.
+If the user asks you anything about this harness or wants to improve or set it up, load the skill `harness`; if the skill cannot be loaded, read `.claude/skills/harness/SKILL.md` and the `index.md` linked there instead. Half-knowledge is dangerous: read the documents that touch your topic in full. The state of this harness (which coding agents work here, sync duties, decisions, deviations, open points) is not in this file but in `.claude/skills/harness/MEMORY.md` – this file is for working WITH the harness, that one for working ON it.
 
-## Regeldateien
+## Rule files
 
-In jedem Ordner, in dem eine `AGENTS.md` angelegt wird, muss daneben eine `CLAUDE.md` angelegt werden, die genau eine Zeile enthält: `@AGENTS.md`. In eine `CLAUDE.md` wird nie eigener Inhalt geschrieben. Wenn du diese Datei oder einen Skill bearbeitest, schreibst du für dich selbst: kompakt, Fachbegriffe, jede Regel mit Begründung, nichts Offensichtliches.
+In every folder where an `AGENTS.md` is created, a `CLAUDE.md` must be created next to it containing exactly one line: `@AGENTS.md`. No content of its own is ever written into a `CLAUDE.md`. When you edit this file or a skill, you are writing for yourself: compact, technical terms, every rule with a rationale, nothing obvious.
 
-## Projekt
+## Project
 
-<!-- Bei der Einrichtung ausfüllen: ein Satz, worum es geht; grober Aufbau (bewusst unvollständig); Sprache für Antworten, Dokumentation und Kommentare. -->
+<!-- Fill in during setup: one sentence on what this is about; rough structure (deliberately incomplete); language for answers, documentation, and comments. -->
 
-## Coding-Agenten in diesem Projekt
+## Project memory (`.my-memory/`) – librarian
 
-<!-- Bei der Einrichtung ausfüllen: je eingesetztem Agenten ein Satz – welche Features er unterstützt (Subagenten, Skills, Slash Commands, Regeldateien in Unterordnern, rules, projektlokale MCP-Konfiguration) und wo die Dateien dafür liegen. Quelle der Wahrheit für Subagenten ist `.claude/agents/`; andere Formate werden mit `python3 tools/sync-agents.py` erzeugt. -->
+This project has a persistent wiki memory in `.my-memory/` (LLM-wiki pattern: `wiki/` = dense knowledge pages with an index per folder, `raw/` = immutable originals). It is served exclusively by the **librarian** subagent. Reason: it filters, finds, and ingests so that your context stays lean and knowledge survives the session.
 
-## Projektgedächtnis (`.my-memory/`) – librarian
+1. **Start of work:** If the task needs prior knowledge (project facts, earlier decisions, relationships), consult the librarian FIRST (QUERY mode) and tell it your intention – it delivers the distillate and the topics useful for it. Only when it reports `NOT IN WIKI` do you ask the user. If the task needs no prior knowledge, the consultation is skipped. For any planning, the consultation is mandatory.
+2. **End of work / end of a section:** Via the librarian (INGEST mode), store only what has lasting, cross-session value: decisions with their rationale, stable insights and patterns, hard-won pitfalls, operations/access/domain knowledge, changed project facts. Do NOT store: a question just answered, progress/status notes, detail recoverable from the code via `grep`, log output, stack traces, trivia. Guiding question: "Will a future session need this?" When in doubt, no. Provide the context (which project/subsystem/topic); if it reports `CONTEXT UNCLEAR`, clarify the attribution (with the user if necessary) and re-issue the task.
+3. **Never read or write `.my-memory/` directly** – not even from subagents. Every access goes through the librarian. No exceptions.
+4. **Efficiency:** If knowledge to be stored already exists as a file, give the librarian the path instead of copying the content; for source documents it places the original in `raw/`.
+5. **Curation:** The wiki is cleaned up periodically and deliberately triggered (MAINTENANCE mode) – never in passing, deletions only with the user's approval.
 
-Dieses Projekt hat ein persistentes Wiki-Gedächtnis in `.my-memory/` (LLM-Wiki-Muster: `wiki/` = dichte Wissensseiten mit Index je Ordner, `raw/` = unveränderliche Originale). Es wird ausschließlich vom Subagenten **librarian** bedient. Grund: Er filtert, findet und lagert ein, damit dein Kontext schlank bleibt und Wissen die Session überlebt.
+## Quality assurance – evaluator
 
-1. **Arbeitsbeginn:** Braucht die Aufgabe Vorwissen (Projektfakten, frühere Entscheidungen, Zusammenhänge), konsultiere ZUERST den librarian (Modus ABFRAGE) und nenne ihm deine Intention – er liefert das Destillat und die dafür nützlichen Themen. Erst wenn er `NICHT IM WIKI` meldet, frage den Benutzer. Braucht die Aufgabe kein Vorwissen, entfällt die Konsultation. Bei jeder Planung ist die Konsultation Pflicht.
-2. **Arbeitsende / Ende eines Abschnitts:** Lagere über den librarian (Modus EINLAGERUNG) nur ein, was dauerhaften, sitzungsübergreifenden Wert hat: Entscheidungen samt Begründung, stabile Erkenntnisse und Muster, hart erkämpfte Fallstricke, Betriebs-/Zugangs-/Domänenwissen, geänderte Projektfakten. NICHT einlagern: eine gerade beantwortete Nachfrage, Fortschritts-/Statusnotizen, per `grep` aus dem Code wiederbeschaffbares Detail, Log-Ausgaben, Stacktraces, Triviales. Leitfrage: „Braucht eine zukünftige Session das?" Im Zweifel nicht. Gib den Kontext mit (welches Projekt/Teilsystem/Thema); meldet er `KONTEXT UNKLAR`, kläre die Zugehörigkeit (notfalls beim Benutzer) und beauftrage erneut.
-3. **Niemals direkt in `.my-memory/` lesen oder schreiben** – auch nicht aus Subagenten. Jeder Zugriff läuft über den librarian. Keine Ausnahmen.
-4. **Effizienz:** Liegt einzulagerndes Wissen als Datei vor, nenne dem librarian den Pfad statt den Inhalt zu kopieren; bei Quelldokumenten legt er das Original in `raw/` ab.
-5. **Kuratierung:** Das Wiki wird periodisch und bewusst angestoßen aufgeräumt (Modus WARTUNG) – nie nebenbei, Löschungen nur mit Freigabe des Benutzers.
+This project works by the generator→evaluator pattern. The **evaluator** subagent is a skeptical second reviewer without write permissions: it reads specification, diff, and evidence in its own fresh context and answers `PASS` or `NEEDS_WORK` plus concrete findings. Reason: the builder never grades its own work – a second pair of eyes finds different mistakes.
 
-## Qualitätssicherung – evaluator
+1. **After every completed task or subtask** ALWAYS run the evaluator BEFORE the result is reported or accepted as done. "Looks good" or "should work" is no substitute for a check.
+2. **Produce real, observable evidence first** (test logs, build output, screenshots) and give the evaluator context: the task or acceptance criteria, changed files, paths to the evidence. It trusts no claims.
+3. **If it reports `NEEDS_WORK`, comply:** work through all findings – no debate, no explaining away, no weakened tests or loosened acceptance criteria.
+4. **Have every rework re-checked.** The loop runs until it reports `PASS`. Only then does the task count as complete.
+5. **Focus areas:** The evaluator can be called with a focus (security, performance, clean code, coding guidelines, architecture). <!-- Decide during setup which focus areas run at which scope of change and whether dedicated focus evaluators are created. -->
 
-Dieses Projekt arbeitet nach dem Generator→Evaluator-Muster. Der Subagent **evaluator** ist ein skeptischer Zweitgutachter ohne Schreibrechte: Er liest Spezifikation, Diff und Evidenz in eigenem, frischem Kontext und antwortet mit `PASS` oder `NEEDS_WORK` samt konkreten Findings. Grund: Der Builder benotet nie seine eigene Arbeit – ein zweiter Blick findet andere Fehler.
+## Context-window discipline
 
-1. **Nach jeder abgeschlossenen Aufgabe oder Teilaufgabe** IMMER den evaluator ausführen, BEVOR das Ergebnis als fertig gemeldet oder akzeptiert wird. „Sieht gut aus" oder „sollte funktionieren" ersetzt keine Prüfung.
-2. **Erzeuge vorher echte, beobachtbare Evidenz** (Test-Logs, Build-Output, Screenshots) und gib dem evaluator Kontext: Aufgabe bzw. Akzeptanzkriterien, geänderte Dateien, Pfade zur Evidenz. Er vertraut keinen Behauptungen.
-3. **Meldet er `NEEDS_WORK`, ist dem Folge zu leisten:** alle Findings abarbeiten – keine Diskussion, kein Wegerklären, keine abgeschwächten Tests oder gelockerten Akzeptanzkriterien.
-4. **Nach jeder Nachbesserung erneut prüfen lassen.** Die Schleife läuft, bis er `PASS` meldet. Erst dann gilt die Aufgabe als abgeschlossen.
-5. **Schwerpunkte:** Der evaluator kann mit Fokus aufgerufen werden (Sicherheit, Performance, Clean Code, Coding-Guidelines, Architektur). <!-- Bei der Einrichtung festlegen, welche Schwerpunkte bei welchem Änderungsumfang laufen und ob eigene Schwerpunkt-Evaluatoren angelegt werden. -->
+Be frugal with your context window. Delegate large reading, search, and research tasks to subagents whose result comes back as a terse distillate (e.g., per file: path + one sentence + at most three sentences of rationale) instead of reading files in full on suspicion. Phrase assignments to subagents as a letter to an equally capable instance – with context and goal, not as a list of commands. On long runs you are the orchestrator: you plan, delegate, check; subagents implement.
 
-## Kontextfenster-Disziplin
+## Standard workflow
 
-Gehe sparsam mit deinem Kontextfenster um. Große Lese-, Such- und Rechercheaufgaben delegierst du an Subagenten, deren Ergebnis als knappes Destillat zurückkommt (z. B. je Datei Pfad + ein Satz + max. drei Sätze Begründung), statt Dateien auf Verdacht vollständig zu lesen. Formuliere Aufträge an Subagenten als Brief an eine gleich fähige Instanz – mit Kontext und Ziel, nicht als Befehlsliste. Bei langen Läufen bist du Orchestrator: du planst, delegierst, prüfst; Subagenten setzen um.
+<!-- Define during setup and tailor to the project. Suggestion: -->
+1. Gather prior knowledge (librarian; read linked documents that touch the topic).
+2. For non-trivial tasks, plan briefly; write acceptance criteria in checkable form.
+3. Implement; deterministic checks via script (linters, tests, build).
+4. Evaluator loop until `PASS`.
+5. Update documentation and wiki (lasting knowledge only); add to `AGENTS.md` when a sentence was needed for the umpteenth time.
 
-## Standard-Workflow
+## Tools and scripts
 
-<!-- Bei der Einrichtung festlegen und auf das Projekt zuschneiden. Vorschlag: -->
-1. Vorwissen holen (librarian; verlinkte Dokumente, die das Thema berühren, lesen).
-2. Bei nicht-trivialen Aufgaben kurz planen; Akzeptanzkriterien abhakbar aufschreiben.
-3. Umsetzen; deterministische Prüfungen per Skript (Linter, Tests, Build).
-4. Evaluator-Schleife bis `PASS`.
-5. Dokumentation und Wiki nachziehen (nur Bleibendes); `AGENTS.md` ergänzen, wenn ein Satz zum wiederholten Mal nötig war.
+- `python3 tools/agent-start.py` – start, list, attach to, and kill coding agents for no-questions runs (tmux/psmux optional). Without arguments: help.
+- New scripts for this harness are built following the principles in `.claude/skills/harness/skripte.md` and recorded here with one sentence each.
+<!-- During setup: MCP servers (e.g., Playwright for web apps, cua-computer-use for desktop apps) and the rule when they are ALWAYS to be used; further project-specific scripts. -->
 
-## Werkzeuge und Skripte
+## Architecture and coding guidelines
 
-- `python3 tools/agent-start.py` – Coding-Agenten für rückfragefreie Läufe starten, auflisten, anhängen, beenden (tmux/psmux optional). Ohne Argumente: Hilfe.
-- `python3 tools/sync-agents.py` – nach jeder Änderung in `.claude/agents/` ausführen; erzeugt die Subagent-Definitionen für andere Agenten (z. B. `.opencode/agent/`).
-- Neue Skripte für diesen Harness werden nach den Prinzipien in `.claude/skills/harness/skripte.md` gebaut und hier mit je einem Satz eingetragen.
-<!-- Bei der Einrichtung: MCP-Server (z. B. Playwright für Web-Apps, cua-computer-use für Desktop-Apps) und die Regel, wann sie IMMER zu verwenden sind; weitere projektspezifische Skripte. -->
+<!-- Fill in during setup: the most important rules in about 20 lines (Pareto). The full catalog belongs in a skill (e.g., `.claude/skills/coding-guidelines/`), mentioned here with one sentence. -->
 
-## Architektur und Coding-Guidelines
+## Pitfalls
 
-<!-- Bei der Einrichtung ausfüllen: die wichtigsten Regeln in ca. 20 Zeilen (Pareto). Der vollständige Katalog gehört in einen Skill (z. B. `.claude/skills/coding-guidelines/`), der hier mit einem Satz genannt wird. -->
-
-## Fallstricke
-
-<!-- Nur, was wehtut, wenn es fehlt: „Nach Änderung an X muss Y, sonst Z." Jeder Eintrag ein Satz. -->
+<!-- Only what hurts when missing: "After changing X, Y must happen, or else Z." One sentence per entry. -->

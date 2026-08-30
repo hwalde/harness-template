@@ -27,7 +27,7 @@ tools/sync-agents.py       Translate subagent definitions into other formats
 
 **evaluator** – checks with a fresh context and no write access against specification, diff and evidence; answers `PASS` or `NEEDS_WORK`. Optionally with a focus (security, performance, clean code, guidelines, architecture).
 **librarian** – the only door to the project memory; filters what stays (decisions with their reasons, pitfalls, operational knowledge) and rejects noise.
-**Harness skill** – twelve short documents: the guided setup, what a harness needs, rule files, knowledge storage and its alternatives, evaluators, skills, when MCP and when a script, the ten principles for agent-friendly scripts, autonomous runs, workflow, agent compatibility, freilauf.
+**Harness skill** – twelve short documents: the guided setup, what a harness needs, rule files, knowledge storage and its alternatives, evaluators, skills, when MCP and when a script, the ten principles for agent-friendly scripts, autonomous runs, workflow, agent compatibility, freilauf. Next to them `MEMORY.md`, which records the state of your harness: setup status, agents in use, decisions with their reasons, open points.
 
 ## Quick start
 
@@ -43,7 +43,7 @@ Claude Code works out of the box. For opencode the subagents are generated. All 
 
 ## Languages
 
-Only what humans read is trilingual: these READMEs (EN/ZH/DE). The harness files themselves (`AGENTS.md`, subagents, skill) exist in a single German edition – coding agents read them regardless of your language, and a single edition means no translation sync. If you would rather have them in your language: step 0 of the setup lets your agent translate them once. The scripts in `tools/` speak English (source-code language).
+Only what humans read is trilingual: these READMEs (EN/ZH/DE). Everything technical – `AGENTS.md`, the subagents, the skill, the wiki skeleton and the scripts in `tools/` – is monolingual English: coding agents read it regardless of your language, and a single edition means no translation sync. If you would rather have the harness files in your own language: step 0 of the setup lets your agent translate them once, in place.
 
 ## freilauf: the superstructure
 

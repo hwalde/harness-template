@@ -1,63 +1,64 @@
-# Regeldateien: AGENTS.md, CLAUDE.md, Unterordner, rules
-**Kern:** Die Regeldatei wird bei jedem Start gelesen – hinein gehört nur, was immer gilt, plus die Fallstricke, die wehtun. Alles Aufgabenspezifische wird ausgelagert und verlinkt. (Kontext: Harness-Template | Stand: 2026-08-30)
+# Rule files: AGENTS.md, CLAUDE.md, subfolders, rules
+**Core:** The rule file is read at every start – only what always applies belongs in it, plus the pitfalls that hurt. Everything task-specific is moved out and linked. (Context: harness template | As of: 2026-08-30)
 
-## Zwei Namen, eine Datei
-- `AGENTS.md` ist der agentenübergreifende Standard; Claude Code liest `CLAUDE.md`. Lösung dieses Templates: **`CLAUDE.md` enthält genau eine Zeile `@AGENTS.md`** (Include-Syntax von Claude Code), alles Wissen steht in `AGENTS.md`. Regel: In jedem Ordner, in dem eine `AGENTS.md` angelegt wird, wird daneben eine `CLAUDE.md` mit `@AGENTS.md` angelegt. Im Kontext erscheinen beide als Memory-Dateien; prüfen mit `/context` (Claude Code) bzw. dem Kontext-Befehl des Agenten.
-- Dateinamen in Großbuchstaben (manche Agenten akzeptieren Kleinschreibung, Best Practice ist groß).
-- `CLAUDE.local.md` (bzw. das Gegenstück des Agenten): wird zum selben Zeitpunkt gelesen, bleibt aber lokal beim Entwickler (gitignored) – für persönliche Vorlieben und maschinenspezifische Werte (Ports, Pfade).
-- Welche Agenten was lesen und ob sie Includes können: [agenten-kompatibilitaet.md](agenten-kompatibilitaet.md).
+## Two names, one file
+- `AGENTS.md` is the cross-agent standard; Claude Code reads `CLAUDE.md`. This template's solution: **`CLAUDE.md` contains exactly one line `@AGENTS.md`** (Claude Code's include syntax), all knowledge lives in `AGENTS.md`. Rule: in every folder where an `AGENTS.md` is created, a `CLAUDE.md` with `@AGENTS.md` is created next to it. In the context both appear as memory files; check with `/context` (Claude Code) or the agent's context command.
+- File names in upper case (some agents accept lower case, best practice is upper case).
+- `CLAUDE.local.md` (or the agent's counterpart): read at the same moment but stays local with the developer (gitignored) – for personal preferences and machine-specific values (ports, paths).
+- Which agents read what and whether they can do includes: [agenten-kompatibilitaet.md](agenten-kompatibilitaet.md).
 
-## Die vier Orte
-| Ort | Zweck | Wann gelesen |
+## The four places
+| Place | Purpose | When read |
 |---|---|---|
-| Projektwurzel | Überblick, Regeln, Workflow, Fallstricke | sofort beim Start |
-| Parent-Ordner (Monorepo) | Gemeinsames für alle Unterprojekte | sofort beim Start (Unterprojekt öffnen → Parent wird mitgelesen) |
-| Benutzerordner (z. B. `~/.claude/CLAUDE.md`) | projektübergreifende persönliche Regeln (Sprache, Schreibweise) | sofort beim Start |
-| Unterordner | nur für Arbeit in diesem Ordner (Fachmodul) | **situativ** – erst wenn der Agent dort eine Datei liest oder arbeitet; verschachtelte Unterordner ziehen die übergeordneten Dateien mit |
+| Project root | overview, rules, workflow, pitfalls | immediately at start |
+| Parent folder (monorepo) | what all subprojects share | immediately at start (open a subproject → the parent is read along) |
+| User folder (e.g., `~/.claude/CLAUDE.md`) | cross-project personal rules (language, spelling) | immediately at start |
+| Subfolder | only for work in this folder (domain module) | **situationally** – only when the agent reads a file there or works there; nested subfolders pull in the files above them |
 
-Situativ geladene Regeln landen am Ende des Chats – der Position, auf die das Modell am aufmerksamsten ist. Das macht Unterordner-Regeldateien und rules-Dateien wirksamer als denselben Text in der Wurzel.
+Situationally loaded rules land at the end of the chat – the position the model pays the most attention to. That makes subfolder rule files and rules files more effective than the same text in the root.
 
-## Was hinein gehört – und was nicht
-**Hinein (in ca. 20 Zeilen Kernregeln):**
-- Projektbeschreibung in einem Satz; grober Aufbau (bewusst unvollständig).
-- Die wichtigsten Architektur- und Coding-Regeln (Pareto: 80/20 – „wir nutzen DDD, X machen wir auf Art Y"), nicht die tausend Guidelines.
-- Der Standard-Workflow (Reihenfolge der Schritte, siehe [workflow.md](workflow.md)) und die Abnahmepflicht (Evaluator).
-- Werkzeuge und Skripte, die zu verwenden sind – je ein Satz, deutlich: „Für X IMMER `tools/y.py`, NICHT z."
-- „Fallstricke, die Aua machen": Dinge, deren Fehlen viel Schmerz erzeugt („nach Änderung an X den Cache im Store leeren, sonst startet die App nicht"). Die einzige Ausnahme von der Sparsamkeitsregel.
-- Testhinweise (dürfen etwas ausführlicher sein).
-- Verweise: „Wo finde ich was?" – Dokumente, Ordner, Skills, und wer den Rest weiß (librarian).
+## What belongs in – and what does not
+**In (about 20 lines of core rules):**
+- Project description in one sentence; rough structure (deliberately incomplete).
+- The most important architecture and coding rules (Pareto: 80/20 – "we use DDD, we do X in way Y"), not the thousand guidelines.
+- The standard workflow (order of the steps, see [workflow.md](workflow.md)) and the acceptance duty (evaluator).
+- Tools and scripts that are to be used – one sentence each, emphatic: "For X ALWAYS `tools/y.py`, NOT z."
+- "Pitfalls that hurt": things whose absence produces a lot of pain ("after changing X, clear the cache in the store, or the app won't start"). The only exception to the frugality rule.
+- Testing notes (may be a bit more detailed).
+- References: "where do I find what?" – documents, folders, skills, and who knows the rest (librarian).
 
-**Nicht hinein:**
-- Offensichtliches, das jedes Modell kennt (`npm run dev`, „das ist ein React-Projekt", was ein Repository ist, das Schichtenmodell).
-- Situative Details, Coding-Guideline-Kataloge, Romane, lange Dokumentlisten – das gehört in verlinkte Dokumente, Unterordner-Regeldateien, rules oder Skills.
-- Veraltete Regeln: Sie werden brav befolgt und machen die Datei zum Klotz. Bei jedem Fehlverhalten zuerst in die eigene Regeldatei schauen.
-- Secrets, maschinenspezifische Werte (→ `CLAUDE.local.md`, Umgebungsvariablen).
+**Not in:**
+- The obvious that every model knows (`npm run dev`, "this is a React project", what a repository is, the layer model).
+- Situational details, coding-guideline catalogs, novels, long document lists – that belongs in linked documents, subfolder rule files, rules, or skills.
+- Outdated rules: they are dutifully followed and turn the file into dead weight. On any misbehavior, look into your own rule file first.
+- Secrets, machine-specific values (→ `CLAUDE.local.md`, environment variables).
+- Harness-internal state (which coding agents work here and what they support, sync duties, setup decisions, open points): it is needed only when someone works ON the harness, not with it → [MEMORY.md](MEMORY.md) of the harness skill.
 
-Anthropic hat 90 % der eigenen Prompts in Claude Code gestrichen, weil sie nicht mehr halfen, sondern beschränkten. Haltung: klein halten, lieber Artefakte verlinken (auch komplexe: Test-Suite, Diagramm, Dokumentationsordner) – der Agent findet das Richtige darin selbst.
+Anthropic cut 90% of its own prompts in Claude Code because they no longer helped but constrained. Attitude: keep it small, prefer linking artifacts (even complex ones: test suite, diagram, documentation folder) – the agent finds the right thing in them itself.
 
-## Auslagern und verlinken
-- Zweitdokument: „Wenn X vorkommt, lies `docs/x.md`." Inhalt steht nur dort.
-- Ganzer Ordner: „Bevor du mit Arbeit in diesem Projekt beginnst, schau in den `docs`-Ordner, ob ein Dokument dein Thema berührt, und lies es dann." Gegenrichtung: Neu Erarbeitetes dort ablegen – **immer dazu sagen, was gespeichert werden soll und was nicht**, sonst speichert der Agent Unbrauchbares.
-- Verlinkungs-Pattern statt Custom Subagent: Die Beschreibungen aller Custom Subagents liegen dauerhaft im Kontext (Größenordnung ein paar tausend Tokens). Ein Dreizeiler „Wenn du X wissen willst, starte einen Subagenten, der `docs/x-experte.md` liest und den Anweisungen folgt" hat denselben Effekt ohne Dauerkosten. Custom Subagent nur, wenn er ständig gebraucht wird oder viel Wissen/eine klare Rolle trägt (evaluator, librarian).
-- Skill statt Regeldatei für Wissen, das nicht jeden Lauf angeht (Coding-Guidelines, Weiterentwicklungswissen eines Systems, dessen Einstiegspunkt selbst ein Agent ist) → [skills-und-commands.md](skills-und-commands.md).
+## Moving out and linking
+- Second document: "If X comes up, read `docs/x.md`." The content lives only there.
+- Whole folder: "Before you start work in this project, check the `docs` folder for a document touching your topic, and read it." The reverse direction: store newly worked-out results there – **always state what should be stored and what not**, otherwise the agent stores the unusable.
+- Linking pattern instead of a custom subagent: the descriptions of all custom subagents sit permanently in the context (order of magnitude: a few thousand tokens). A three-liner "If you want to know X, start a subagent that reads `docs/x-expert.md` and follows the instructions" has the same effect without the standing cost. A custom subagent only when it is needed constantly or carries a lot of knowledge/a clear role (evaluator, librarian).
+- A skill instead of a rule file for knowledge that does not concern every run (coding guidelines, evolution knowledge of a system whose entry point is itself an agent) → [skills-und-commands.md](skills-und-commands.md).
 
-## Unterordner-Regeldateien (fachliche Module)
-- Voraussetzung: ein fachlich geschnittener Ordnerbaum (Screaming Architecture – von außen sieht man, worum es geht) und ein Agent, der Regeldateien in Unterordnern situativ lädt (prüfen in [agenten-kompatibilitaet.md](agenten-kompatibilitaet.md) – der dortige Snapshot nennt es u. a. für Claude Code und Codex, verifiziert wird bei der Einrichtung).
-- Hinein: nur das, was über den normalen Gebrauch hinausgeht – modulspezifische Fallstricke, Konventionen, Schnittstellen. Nicht: was ein Service oder Repository ist.
-- Auch hier: `AGENTS.md` + `CLAUDE.md` mit `@AGENTS.md` nebeneinander.
+## Subfolder rule files (domain modules)
+- Prerequisite: a domain-cut folder tree (screaming architecture – from the outside you can see what it is about) and an agent that loads rule files in subfolders situationally (check in [agenten-kompatibilitaet.md](agenten-kompatibilitaet.md) – the snapshot there lists it for Claude Code and Codex, among others; verify during setup).
+- In: only what goes beyond normal use – module-specific pitfalls, conventions, interfaces. Not: what a service or repository is.
+- Here too: `AGENTS.md` + `CLAUDE.md` with `@AGENTS.md` side by side.
 
-## rules-Dateien (pfadgebundene Regeln)
-- Was: Prompt-Dateien, deren Geltung an Dateipfade/-muster gebunden ist – sie werden nur geladen, wenn der Agent eine passende Datei anfasst. Beispiel: Gestaltungsregeln nur für Testdateien, Frontend-Konventionen nur für `src/ui/**`.
-- Wo: Claude Code `.claude/rules/*.md` mit Frontmatter `paths:`; Cursor `.cursor/rules/*.mdc` mit `globs`/`alwaysApply`; GitHub Copilot `.github/instructions/*.instructions.md` mit `applyTo`. Andere Agenten: [agenten-kompatibilitaet.md](agenten-kompatibilitaet.md).
-- Faustregel: Eine Regel, die nur situativ gelesen werden soll, gehört genau dorthin – nicht in die Wurzel-Regeldatei.
+## rules files (path-bound rules)
+- What: prompt files whose validity is bound to file paths/patterns – they are loaded only when the agent touches a matching file. Example: styling rules only for test files, frontend conventions only for `src/ui/**`.
+- Where: Claude Code `.claude/rules/*.md` with frontmatter `paths:`; Cursor `.cursor/rules/*.mdc` with `globs`/`alwaysApply`; GitHub Copilot `.github/instructions/*.instructions.md` with `applyTo`. Other agents: [agenten-kompatibilitaet.md](agenten-kompatibilitaet.md).
+- Rule of thumb: a rule that should only be read situationally belongs exactly there – not in the root rule file.
 
-## Für die KI schreiben, nicht für Menschen
-- Zielgruppe ist das Modell: eigener Wortschatz, Fachbegriffe/Buzzwords statt Erklärsätze, kristallklar, keine Höflichkeitsprosa. Menschendokumente bei Bedarf in zwei Fassungen (ausführlich für Menschen, knapp für die KI).
-- **Regeln begründen:** Anweisungen mit Begründung werden eher befolgt. Nie gegen den Systemprompt argumentieren („die Regel des Systemprompts ist aufgehoben") – höhere Gewichtung, Prompt-Injection-Verdacht. Stattdessen Nutzung fordern, Dringlichkeit erhöhen, begründen.
-- WICHTIG / NICHT / IMMER für kritische Regeln – das fällt Agenten auf.
-- Zahlen statt Adjektive: „max. drei Sätze" wirkt zuverlässiger als „kurz". Aber: „maximal drei Sätze" liefert immer drei Sätze, „tokensparend" liefert Unverständliches – Ergebnis prüfen, testen, dann committen.
-- Regeln vom Agenten für sich selbst formulieren lassen (Meta-Prompting): Ziel nennen („Was muss in `AGENTS.md`, damit der librarian weiterhin konsultiert wird?") plus Rahmen: sehr kompakt, für dich geschrieben, nicht über andere Agenten reden, ein bis drei Sätze. `/init`-Ergebnisse sind fast immer zu lang – Kürze beim Aufruf verlangen.
-- Wiederholst du einen Satz zum wiederholten Mal im Chat, lässt du ihn im selben Auftrag in die Regeldatei aufnehmen („bei nicht lesbaren Webseiten Playwright-MCP verwenden"). So wächst der Harness nebenbei.
+## Write for the AI, not for humans
+- The audience is the model: its own vocabulary, technical terms/buzzwords instead of explanatory sentences, crystal clear, no politeness prose. Human documents in two versions if needed (detailed for humans, terse for the AI).
+- **Justify rules:** instructions with a rationale are followed more reliably. Never argue against the system prompt ("the system prompt's rule is lifted") – higher weighting, prompt-injection suspicion. Instead demand usage, raise urgency, justify.
+- IMPORTANT / NOT / ALWAYS for critical rules – agents notice these.
+- Numbers instead of adjectives: "max. three sentences" works more reliably than "short". But: "at most three sentences" always delivers three sentences, "token-frugal" delivers the unintelligible – check the result, test, then commit.
+- Have the agent phrase rules for itself (meta-prompting): state the goal ("What must go into `AGENTS.md` so that the librarian keeps being consulted?") plus the frame: very compact, written for yourself, do not talk about other agents, one to three sentences. `/init` results are almost always too long – demand brevity in the call.
+- If you repeat a sentence for the umpteenth time in the chat, have it added to the rule file in the same request ("for unreadable web pages use the Playwright MCP"). This is how the harness grows on the side.
 
-## Anti-Patterns
-Situative Details oder Guideline-Kataloge in der Wurzel · Offensichtliches · Romane · veraltete Regeln · Regeln ohne Begründung · Skripte/Tools nicht erwähnt · Speicheranweisung ohne „was rein, was nicht" · Evaluator ohne Abnahmepflicht-Eintrag · Menschentexte 1:1 für die KI · Kleinschreibung der Dateinamen.
+## Anti-patterns
+Situational details or guideline catalogs in the root · the obvious · novels · outdated rules · rules without a rationale · scripts/tools not mentioned · a storage instruction without "what goes in, what stays out" · evaluator without an acceptance-duty entry · human texts 1:1 for the AI · lower-case file names.

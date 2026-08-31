@@ -32,6 +32,22 @@ The smallest configuration is one evaluator. Bigger: several instances one after
 
 Order when several run: first deterministic checks (linters, static analysis, tests – via script, not via model), then functional acceptance (standard evaluator), then the focus areas (security → architecture/guidelines → performance → clean code). Each looks at the changes via `git status`/`git diff` and returns concrete, fixable findings to the main agent; the main agent works through them and has it re-checked. Not all of them for every trifle: define in `AGENTS.md` which evaluators run at which scope of change (e.g., security always for auth/inputs/file access; architecture for new modules).
 
+## Give every concern exactly one owner
+When several evaluators run on the same diff in parallel, any concern named in two of them
+produces the same finding twice, every round. That is not merely noise: it trains the reader to
+skim, and it hides the one finding that mattered. So when you write a second evaluator, write
+its **out of scope** section at the same time, naming the other evaluators and what belongs to
+them – and where two could plausibly claim a concern, give it to one and have the other defer
+explicitly ("that reviewer runs in the same round and its verdict wins").
+
+The same discipline applies against the scripts: whatever the deterministic gate already
+decides must not appear in an evaluator's checklist. A model re-deciding a settled mechanical
+question is pure cost.
+
+And beware of a claim that its own guard does not back: if a rule file says "evaluator X checks
+this", open evaluator X and confirm it actually does. An agent that believes a guard exists
+will stop looking - a false assurance is worse than none.
+
 ## Template for a specialized evaluator
 File `.claude/agents/evaluator-<focus>.md` (translate for other agents with `tools/sync-agents.py`):
 

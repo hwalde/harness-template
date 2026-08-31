@@ -29,6 +29,17 @@ Alternative: `acceptEdits` plus pre-approved commands. For every other agent, lo
 ## Security: a sandbox instead of stripping permissions
 Whoever lets an agent run for days wants neither it getting stuck nor it being unable to edit its own skills. That speaks against "allow as little as possible". The right concept: **allow everything, but inside a sandbox** (e.g., a micro-VM like the Docker sandbox for coding agents, or a container/worktree with limited network). Inside the boundary the agent may do everything; the security comes from the boundary of the environment, not from the length of the deny list. Without a sandbox you are playing with fire – then at least a worktree, Git as a safety net, and no production access.
 
+### Two things a deny list cannot do
+- **A deny scopes an access path, not a capability.** Denying *reading* a key does not stop a
+  tool from *using* it; denying one command spelling does not stop an equivalent one. Before
+  you rely on a deny, ask what the guarded capability actually requires, and gate it where it
+  is exercised - a confirmation flag inside the tool that performs the irreversible act beats
+  a pattern match on a command line.
+- **A guard that can only be satisfied by evading it is worse than none.** If a rule forbids
+  exactly what the workflow requires, the run will find the spelling that slips past - and you
+  have taught evasion while believing you built a barrier. When a deny collides with a
+  documented workflow, one of the two is wrong; fix that, do not add an exception.
+
 ## The launch sequence (proven order)
 1. **Write the prompt** – short, by hand, precise. The substantive core is a **goal hierarchy**: goal 1, goal 2, plus an explicit sentence on the order ("when goal 1 is reached, continue with goal 2"). Phrase the goals so that it pursues them rigorously, but keep them attainable.
 2. **Cut** what the agent does anyway or what plays no role for this run ("keep documents up to date", "note learnings" – that lives in the harness). What remains is the core: goals, framework conditions (usage, costs), enablements.

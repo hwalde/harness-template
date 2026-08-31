@@ -9,7 +9,31 @@
 - The user may skip steps. You note skipped steps under "Open points" in `MEMORY.md` and name them to the user at the end.
 - Keep order: a new harness building block (script, subagent, skill, MCP entry) gets its sentence in `AGENTS.md` immediately – a building block that is unknown does not exist for the agent.
 
-## Step 0 – Language
+## Step 0 – Detach this copy from the template, then settle the language
+
+**Do this before anything else, and do not skip it.** This checkout is a *copy of a template*.
+Its `origin` still points at **<https://github.com/hwalde/harness-template>** – the template
+itself. Every commit and push you make from here would land in the template rather than in the
+user's project, and the template must never be changed by the projects derived from it.
+
+1. Check it: `git remote -v`. If `origin` is the template URL, remove it: `git remote remove origin`.
+   (If the user cloned the template *into* an existing project instead, the situation is
+   reversed – then there is nothing to detach, and the template's files were merely copied in.)
+2. Decide with the user what this harness repository should be. Ask, do not assume:
+   - **Where does it live?** GitHub, GitLab, Bitbucket, an internal Gitea or Azure DevOps, or
+     nowhere at all for now. Do not assume GitHub; many teams and most companies are elsewhere,
+     and plenty of people want no remote at all at first.
+   - **Public or private?** Default to **private** and say why: this repository will accumulate
+     a knowledge store, internal notes, and rules that reveal how the team works. If it is ever
+     to become public – as a teaching example, say – that content must be reviewed *before* the
+     switch, because a public git history cannot be un-published.
+   - Only then create the remote and wire it up. If the user is undecided, leave the repo
+     without a remote and note it under "Open points" – that costs nothing and decides nothing.
+3. The template's `LICENSE` and its trilingual READMEs belong to the template, not to the new
+   project. Deal with them in step 10; just do not commit them as if they described this project.
+
+Then the language question.
+
 The harness files (`AGENTS.md`, subagents, this skill, wiki skeleton) are written in English – agents read them regardless of the project language; only the template's READMEs are trilingual, because humans read those.
 - Ask in which language the user works with the agent and in which language the project's documentation and comments are kept; note that under "Project".
 - If the user wants the harness files in their own language, translate them now, once, in place (keep structure, paths, commands and protocol tokens such as `NOT IN WIKI`/`PASS`/`NEEDS_WORK` consistent), then run `python3 tools/sync-agents.py`. There is deliberately only ONE edition – no language mirrors, no sync effort.
@@ -21,6 +45,21 @@ Look around (repo structure, build system, existing rule files, `docs/`, tests, 
 - How is it built, tested, started, released? Is there one single correct way (→ later an ALWAYS/NOT rule)?
 - Is the folder tree cut by domain (modules) or by technology (layers)? (→ step 3)
 - What regularly hurts (pitfalls)?
+**Settle the layout, because everything else hangs off it.** Two patterns work; pick
+deliberately and record the choice with its reason in [MEMORY.md](MEMORY.md):
+
+| | **One repository** – harness and project together | **Mother and child** – the harness is its own repo, the artifact sits in a gitignored subfolder |
+|---|---|---|
+| Fits when | the release is built and shipped elsewhere, so it does not matter that harness files travel along – most company projects | the repository *is* the deliverable and must contain nothing else: a published library, an open-source project, anything where a stranger clones the artifact |
+| Cost | harness material is in every clone of the project | two repos to keep straight; the agent must know which one it is touching, and CI/merge tooling usually only sees one of them |
+| Bonus | nothing to coordinate | the harness can be swapped, versioned and improved independently of the project |
+
+With the mother/child pattern, be explicit about the consequences: gitignore the child in the
+mother, state the split as a rule in `AGENTS.md` ("nothing lands in `<child>/` that does not
+belong in a release"), and enforce it mechanically in a check script rather than by good
+intentions. Anything that merges, gates or schedules from outside will see only the mother, so
+committing and pushing the child stays the agent's own duty – say so, or it will be forgotten.
+
 Enter "Project" and "Pitfalls" in `AGENTS.md`. If the template was copied into an existing project: work existing `CLAUDE.md`/`AGENTS.md` content into the new `AGENTS.md` (only what always applies, see [regeldateien.md](regeldateien.md)), reduce `CLAUDE.md` to `@AGENTS.md`.
 
 ## Step 2 – Coding agents and their capabilities
@@ -53,17 +92,59 @@ Read [mcp-und-werkzeuge.md](mcp-und-werkzeuge.md). Goal: the agent obtains infor
 
 ## Step 5 – Scripts that support the agent
 Read [skripte.md](skripte.md). Ask: which manual work regularly comes up here that is algorithmic? Typical candidates: starting/stopping servers with pre-checks and restart protection, log analysis with navigation, test runners with diagnosis preparation, build/release via exactly one path, database migrations, status checks (is the service running, is the port free, does the health endpoint report errors), counting/measuring.
+**Before building anything, ask whether a script is the right answer at all.** Three questions
+settle it, and the third is the one people skip:
+1. *Is the task algorithmically decidable?* If it needs judgement, it stays with the model. A
+   script that guesses is worse than no script.
+2. *Can a script actually carry it end to end?* Some tasks depend on things a script cannot
+   supply – a credential, a key, a human decision, a system that may be down. That is not a
+   reason to abandon the script; it is a reason to **split it into stages** so a failure leaves
+   a comprehensible state instead of a half-finished one, and to have it *report* what it
+   cannot do rather than fail obscurely. A release script is the classic case.
+3. *What happens when it aborts?* Write the failure output as an instruction to act. If the
+   honest answer is "an agent has to debug this", then the script is the wrong shape - simplify
+   it until its failure modes are few and each one names its own remedy.
+
+**Link scripts and subagents deliberately - they cover different ground.** A script decides the
+mechanical questions; a subagent judges the rest. The join is the script's output, which lands
+in the context as a prompt: have a `dry-run`/`preflight` stage end by naming the evaluator that
+must run next and what only that evaluator can judge. That way the mechanical gate cannot be
+mistaken for an acceptance, and the agent is told - in the moment it matters - that a green
+script is not a green review. Conversely, keep out of the evaluators anything the script
+already decides: a model re-deciding a settled mechanical question only produces noise and
+duplicate findings.
+
 - For each desired candidate: build it following the ten principles (Python preferred, no venv, help without arguments, human-readable output, exit quickly, error message as an instruction to act) under `tools/`, test it, record it with one sentence each in `AGENTS.md` – including "replaces X, NOT Y anymore" where an old path exists.
 - Check whether the project's existing scripts are agent-friendly (data dumps, JSON blobs, long-runners) and propose conversions.
 
 ## Step 6 – Autonomous runs, monitoring, security
 Read [autonome-laeufe.md](autonome-laeufe.md) and [freilauf.md](freilauf.md).
-1. **No-questions runs:** show `python3 tools/agent-start.py doctor` and a `--dry-run`; set up the agent's permission mode and allow list for the mode without follow-up questions (for Claude Code `dontAsk` plus `permissions.allow` in `.claude/settings.json`). Recommend tmux (macOS/Linux) or psmux (Windows) if runs should keep running in the background and be observable. The entry in "Tools and scripts" exists – extend it project-specifically if needed (e.g., default agent, default model).
+1. **No-questions runs:** show `python3 tools/agent-start.py doctor` and a `--dry-run`; set up the agent's permission mode and allow list for the mode without follow-up questions (for Claude Code `dontAsk` plus `permissions.allow` in `.claude/settings.json` – the template ships a minimal one with the read-only git commands, the harness scripts, and the `SessionStart` hook that runs `tools/bootstrap.py`; extend it project-specifically). Note that some agents refuse to let a running agent widen its own permissions – if an edit to that file is blocked, that is by design: hand the change to the user rather than routing around it. Read the two deny-list limits in [autonome-laeufe.md](autonome-laeufe.md) before relying on a deny for anything irreversible. Recommend tmux (macOS/Linux) or psmux (Windows) if runs should keep running in the background and be observable. The entry in "Tools and scripts" exists – extend it project-specifically if needed (e.g., default agent, default model).
 2. **Usage tracking:** only relevant with subscription quotas – but there practically mandatory for long runs, because at 100 % the subagents die or hang and the run is dead. If yes: clarify the data source (quota command, status data, API) and build a usage script per [skripte.md](skripte.md); the rules (shorten the interval, wait from 90%, subagents check themselves) into `AGENTS.md` or into the prompt template for runs. Costs separately.
 3. **Self-monitoring:** does the project need someone who periodically looks for hanging scripts and lost agents? If yes: a check script (`tools/watch.py` or similar) and the instruction to check every N minutes via the agent's cron/loop tool (e.g., `CronCreate`, `/loop`); name the tool explicitly; test beforehand with a trivial task.
 4. **Not stopping:** the agent's goal command or loop (clarified in step 2); the order "question round first, then goal" as a rule for runs.
 5. **Security:** sandbox (micro-VM/container) or at least worktree + Git + no production access. Split as always: the red line the running agent must obey ("no production access without approval") into `AGENTS.md`, the decision itself with its reason (why sandbox, why only worktree) into `MEMORY.md`.
-6. **Superstructure:** if runs are to happen regularly unattended or on a schedule, introduce freilauf (schedules, worktrees, monitoring from outside, budget gates, merge, notification; `SETUP_WITH_AGENT.md` there) – and point out that a project set up with this template runs in it without adaptation.
+6. **Superstructure – offer freilauf explicitly.** As soon as runs should happen unattended,
+   on a schedule, or across several repos, ask the user whether they want
+   [freilauf](https://github.com/hwalde/freilauf): a self-hosted hub that starts runs on a
+   schedule, gives each its own worktree and tmux session, watches them from outside, gates on
+   budget, merges the result back and notifies. A project set up with this template runs in it
+   without adaptation.
+   - **Check whether it is already installed** (`freilauf status`, or the `freilauf`/`cc-start`
+     binaries on `PATH`) before offering to install it. If it is missing and the user wants it,
+     offer to install it *completely*: clone the repository, read its `README` and
+     `SETUP_WITH_AGENT.md` – the latter is written for coding agents – and follow it. Do not
+     improvise an installation from memory.
+   - **Say plainly that freilauf brings its own system**, because it changes assumptions this
+     template otherwise leaves open: every run gets a fresh **git worktree**, so anything
+     untracked or gitignored that a run needs must be declared as a worktree extra; scheduling,
+     merging and pushing move out of the agent's hands and into the hub; and "done" becomes
+     whatever the hub's finish gate says it is. Read [freilauf.md](freilauf.md) before
+     configuring it, and record the resulting configuration in [MEMORY.md](MEMORY.md) – its UI
+     and field names change between versions, so what you write down is a dated snapshot, not
+     a contract.
+   - If the user does **not** want freilauf, `tools/agent-start.py` plus tmux is the small
+     local edition and nothing else changes.
 
 ## Step 7 – Architecture and coding guidelines
 This is the most important content step. Read [regeldateien.md](regeldateien.md) and [skills-und-commands.md](skills-und-commands.md).
@@ -95,7 +176,14 @@ Read [workflow.md](workflow.md). Agree the standard workflow with the user and w
 4. `python3 tools/sync-agents.py`, `python3 tools/agent-start.py doctor`, check the agent's context view (rule files loaded? unexpected costs?).
 5. Update this skill if the setup produced something project-specific about the harness (new scripts, own evaluators): affected document + `index.md`.
 6. Call the **evaluator**: task "harness setup", criteria = checklist below, evidence = `AGENTS.md`, `MEMORY.md`, created files, script outputs. Until `PASS`.
-7. With a wiki: ingest the decisions with their rationale via the librarian as well. Name open points to the user as a list. Commit if the user wishes.
+7. With a wiki: ingest the decisions with their rationale via the librarian as well. Name open
+   points to the user as a list.
+8. **Commit, and push if there is a remote.** The setup is only real once it is committed: an
+   agent in a fresh session reads files, not this conversation. If step 0 produced a remote,
+   push; if it deliberately produced none, say so in the final report so the user is not left
+   assuming their harness is backed up somewhere. Check `git status` for anything that should
+   have been gitignored rather than committed – a knowledge store belongs in the repo, a
+   `.env`, a key or a machine-specific path does not.
 
 ## Checklist (criteria for the evaluator)
 - [ ] Language settled (harness files translated once if wished); template READMEs replaced or removed
@@ -109,4 +197,8 @@ Read [workflow.md](workflow.md). Agree the standard workflow with the user and w
 - [ ] `agent-start.py doctor` and `--dry-run` run; permission mode/allow list set up if autonomous runs are desired
 - [ ] Security settled: red lines in `AGENTS.md`, the decision with its reason in `MEMORY.md`
 - [ ] `MEMORY.md` reflects the setup: setup status, agents in use, sync duties, decisions with reasons, deviations, open points
+- [ ] Detached from the template repo; remote settled (platform, visibility) or deliberately absent
+- [ ] Repository layout chosen (one repo, or mother/child) and recorded with its reason
+- [ ] freilauf offered; if chosen, installed, configured and its configuration recorded as a dated snapshot
+- [ ] Everything committed; pushed if a remote exists
 - [ ] Open points listed

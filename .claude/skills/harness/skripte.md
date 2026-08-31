@@ -62,6 +62,7 @@ IMPORTANT: do NOT start the server directly with `npm start`. ALWAYS use `python
 | Script | Purpose |
 |---|---|
 | `tools/agent-start.py` (in the template) | start a coding agent without follow-up questions, optionally in tmux/psmux; `list`, `attach`, `send`, `kill`, `doctor` → [autonome-laeufe.md](autonome-laeufe.md) |
+| `tools/bootstrap.py` (in the template) | re-establish one-time setup that lives outside the repository and therefore does not survive a clone; idempotent, silent when nothing is missing, wired to a session hook where the agent has one → [agenten-kompatibilitaet.md](agenten-kompatibilitaet.md) |
 | `tools/sync-agents.py` (in the template) | translate subagent definitions from `.claude/agents/` into the format of other agents → [agenten-kompatibilitaet.md](agenten-kompatibilitaet.md) |
 | Server/service control | start with pre-check, status, logs with navigation, restart protection |
 | Log analysis | newest errors first, age, filters, a detail command for stack traces |
@@ -70,6 +71,14 @@ IMPORTANT: do NOT start the server directly with `npm start`. ALWAYS use `python
 | Monitoring | checks for hanging scripts and lost agents; called periodically by the agent via cron/loop |
 | Counting/measuring tools | words, lengths, dimensions – models count poorly |
 | Build/release | exactly one script for the release build, fixed in `AGENTS.md` as the only path |
+
+## Joining scripts to subagents
+A script settles the mechanical questions; a subagent judges the rest. The join is the script's
+**output**, which lands in the context as a prompt: let a `dry-run`/`preflight` stage end by
+naming the evaluator that must run next and what only that evaluator can judge. The mechanical
+gate then cannot be mistaken for an acceptance. The reverse duty matters just as much: keep out
+of the evaluators whatever the script already decides, or a model re-decides a settled question
+and you collect duplicate findings for free.
 
 ## Pitfalls
 - The script exists but is mentioned nowhere.

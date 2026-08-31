@@ -21,6 +21,13 @@
 3. **Probe:** create a test file (e.g., an `AGENTS.md` in a subfolder with a harmless, recognizable instruction), let the agent work there, observe the behavior, check the context view, remove the test file again.
 4. For each agent enter **one sentence** in [MEMORY.md](MEMORY.md) under "Coding agents in use and what they support": what it supports, where the files live, what is generated for it. Mark the uncertain as "(unconfirmed)". This is harness state, not an operating rule – so it does not go into `AGENTS.md`.
 
+## Setup that does not survive a clone
+Some agents keep part of their project configuration **outside** the project. Then a fresh checkout on a new machine silently lacks it, and no file in the repository shows that anything is missing – the building block simply does not take hold, without an error.
+
+The known case (hermes 0.20.5, verified 2026-08-31 – like everything about a moving target, re-check it): **hermes loads project skills (`.hermes/skills/`, `.agents/skills/`) only for trusted projects**, and keeps the trust list in `~/.hermes/config.yaml`. Until `hermes skills trust <project root>` has run, the harness skill is invisible to it. The command is idempotent and takes about 0.2 s, which is what makes the fix cheap.
+
+Ask question 11 of every agent you investigate: **does any of its project configuration live outside the project?** If yes, do not write it into a README as a manual step – nobody reads those twice. Put it in a bootstrap script that is idempotent and safe to run repeatedly (`tools/bootstrap.py` in this template), and wire that script to run automatically: a `SessionStart` hook for agents that have hooks, otherwise a line in the rule file. Have it print nothing when everything is already in order, so the automatic run costs neither context nor attention.
+
 ## This template's rules for multiple agents
 - Source of truth for rules: `AGENTS.md`; `CLAUDE.md` = `@AGENTS.md`. Agents without includes read `AGENTS.md` directly anyway.
 - Source of truth for subagents: `.claude/agents/`. Other formats are generated (`python3 tools/sync-agents.py`, currently for opencode into `.opencode/agent/`); for further target formats extend the script instead of maintaining copies by hand.

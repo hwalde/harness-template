@@ -25,3 +25,37 @@
 A project set up with this template runs in freilauf without further adaptation: the rules and subagents take hold in every run, the evaluator pass is the natural partner of the finish gate. Mind freilauf's security model (VPN as the access layer; the hub controls tmux, which is shell access).
 
 Setup: `README` and `SETUP_WITH_AGENT.md` in the freilauf repository – the latter is written for coding agents ("Read SETUP_WITH_AGENT.md and set this up for me").
+
+## Registering a project (procedure, not a contract)
+**This is a dated snapshot – freilauf evolves, and its UI, field names and defaults change with it. Verify against the running version before you follow it; if it no longer matches, follow the current UI and update this section.** Observed 2026-08-31 against commit `584e562`; the UI language was German.
+
+- **Find the hub first:** `freilauf status` reports the port, the systemd unit and the deployed sha. An older installation may still carry the pre-rename "cc-hub" naming (`~/.config/cc-hub/env`, `~/.local/share/cc-hub/cc-hub.db`, `cchub.service`); the `freilauf` CLI reads both.
+- **There is no CLI or JSON API for repositories.** `POST /repos/edit` from the HTML form is the only write path, so a browser (Playwright MCP) is the tool. Writing to the SQLite database directly skips the server's validation – avoid it, and if it is ever unavoidable, back the database up with `sqlite3 -readonly … ".backup '<path>'"`, never `cp` (WAL mode).
+- **Fields that matter:** name · path to the main checkout · base branch · repo prompt (what a run must know and cannot see) · **worktree extras** · integration mode · max parallel runs.
+- **Editing an existing repo: resubmit the *whole* form.** The save handler issues one full
+  `UPDATE` over every column, not a patch. A POST carrying only the fields you meant to change
+  silently blanks the repo prompt and resets worktree extras to `[]`. Read the current values
+  first, change the ones you mean, submit everything.
+- **Read the result back** from `/repos` or the database instead of trusting the form – a validation failure renders a problem page rather than saving. Read text columns with a real sqlite binding, not the `sqlite3` CLI: prompts stored with CRLF come back lossy, and rebuilding a prompt from such a dump corrupts it.
+
+### Worktree extras – the field that makes nested checkouts work
+Every run gets its own git worktree, unconditionally, and a worktree contains only **tracked** files. So anything gitignored or untracked that a run needs – `node_modules`, a local config, or, in the mother/child layout, the gitignored subfolder holding the actual artifact – is invisible unless it is listed here. Format: a JSON array of `{"path": "<relative>", "mode": "copy"|"link"}`.
+
+- `link` – one shared real directory. Survives worktree cleanup, and the finish gate does not see it as dirty. The price: **all runs share it**, so they can corrupt each other.
+- `copy` – real isolation per run, but worktree cleanup **deletes the copy** and everything committed inside it. Only safe if the run pushes before finishing.
+- The UI's "find worktree extras" button *replaces* the list with its own suggestion. It cannot know which ignored entry is the point of the project – do not press it on a configured repo.
+
+### Two traps worth knowing before you rely on them
+- **`max_parallel` caps only *scheduled* starts.** Manually started runs are never blocked. If you set it to 1 to protect a shared `link` extra, that protection does not cover manual runs.
+- **A per-run worktree defeats path-keyed machine-local state.** Anything an agent trusts,
+  registers or caches *by absolute path* outside the repo gets a new entry on every run,
+  because every run has a new worktree path. hermes's project-skill trust list in
+  `~/.hermes/config.yaml` is the known case: it grows without bound with paths that no longer
+  exist. Harmless so far, but check for this whenever a bootstrap step keys on a path.
+- **A merge check over a `link` extra inspects live, shared state.** The extras are applied
+  to the integration worktree too, so the link still points at the one real checkout. A merge
+  check that examines it is therefore reading whatever any other run - or the human at the
+  keyboard - has left there right now: an unrelated dirty file fails this run's merge, and a
+  run can equally be credited with commits it never made. Accept it as a smoke alarm rather
+  than a proof, and keep `max_parallel` low.
+- **Hub merging pushes.** With integration set to hub, freilauf merges the run branch into the base branch and does `git push origin base:base`. Decide deliberately whether that remote is one an unattended run may write to – and note that in a mother/child layout it can only ever push the *mother*: the child is a separate repository that git's merge machinery never sees, so committing and pushing it stays the run's own duty. Say that in the repo prompt, or runs will assume the hub handled it.

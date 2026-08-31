@@ -54,6 +54,7 @@ Be frugal with your context window. Delegate large reading, search, and research
 ## Tools and scripts
 
 - `python3 tools/agent-start.py` – start, list, attach to, and kill coding agents for no-questions runs (tmux/psmux optional). Without arguments: help.
+- `python3 tools/bootstrap.py` – one-time local setup that does not survive a `git clone` (agent configuration living outside the repo). Idempotent and silent when nothing is missing. Run it once in a fresh checkout; agents with hooks can run it automatically.
 - New scripts for this harness are built following the principles in `.claude/skills/harness/skripte.md` and recorded here with one sentence each.
 <!-- During setup: MCP servers (e.g., Playwright for web apps, cua-computer-use for desktop apps) and the rule when they are ALWAYS to be used; further project-specific scripts. -->
 

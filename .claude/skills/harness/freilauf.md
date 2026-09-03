@@ -9,6 +9,7 @@
 - **Budget gates:** scheduled starts wait when subscription quota or credit is running low.
 - **Reports** from the agent (`cc-report done|failed|help|progress|branch|pr`), **Telegram notifications**, **no-code flows** (what happens after a run: follow-up runs, messages to running agents, extraction from reports, branching).
 - **Coding agents and model providers as plugins:** Claude Code, opencode, hermes, cursor-agent, and others; more via plugin package. The interface in English, German, and Chinese.
+- **Skills for the agent that operates it:** freilauf ships user-level skills (`freilauf-agents`, `freilauf-runs`, `freilauf-flows`, `freilauf-repos`, `freilauf-models`, `freilauf-plugins`, `freilauf-stats`), so a coding agent can set the hub up and read it from the shell instead of the browser. `freilauf-agent-flow-builder` is the builder among them (see below).
 - Contains the start/attach scripts (`cc-start`, `cc-attach`, `cc-kill`, `cc-report`), of which `tools/agent-start.py` in this template is the project-local small edition.
 
 ## When it pays off
@@ -25,6 +26,9 @@
 A project set up with this template runs in freilauf without further adaptation: the rules and subagents take hold in every run, the evaluator pass is the natural partner of the finish gate. Mind freilauf's security model (VPN as the access layer; the hub controls tmux, which is shell access).
 
 Setup: `README` and `SETUP_WITH_AGENT.md` in the freilauf repository – the latter is written for coding agents ("Read SETUP_WITH_AGENT.md and set this up for me").
+
+### Concepts made of agents and flows (`freilauf-agent-flow-builder`)
+Delivered at user level together with the other `freilauf-*` skills, this one is the builder: it sets a whole ready-made concept – agents plus the flows around them – up in a project. Triggers are "the project should work through its tasks by itself" and "set up the swarm". The first concept is the **task swarm**: a watchdog flow (cron, no LLM) counts the open tasks and wakes a short-lived dispatcher agent, which starts worker agents repeatedly and staggered in time according to the backlog – GLM-5.3-Flash as the workhorse, DeepSeek for the trivial, the strong lane (Claude Code / fable) while subscription quota is free and Gemini otherwise; a third failed attempt on a task goes to the PO automatically, and a PO agent presents the questions that are waiting. Where the tasks come from is a contract with adapters (finding register, GitHub issues, or one of your own), and the engine is copied into the project as a template – at runtime nothing is called out of the skill folder.
 
 ## Registering a project (procedure, not a contract)
 **This is a dated snapshot – freilauf evolves, and its UI, field names and defaults change with it. Verify against the running version before you follow it; if it no longer matches, follow the current UI and update this section.** Observed 2026-08-31 against commit `584e562`; the UI language was German.

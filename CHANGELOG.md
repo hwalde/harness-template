@@ -2,6 +2,12 @@
 
 All notable changes to the `harness` skill. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [Semantic Versioning](https://semver.org/): templates or procedure changed incompatibly → major, new building block or document → minor, wording → patch. The version lives in `metadata.version` of `SKILL.md`; a project records the version it was built with in its `HARNESS.md`. A **Migration** line says what a project built with an older version needs by hand – everything else route E (`scripts/build.py --check`) carries over.
 
+## [1.2.0] – 2026-09-04
+
+### Added
+- `SKILL.md` "The working style": the harness is built in a guided conversation, never delivered finished – every decision is explained in plain language, options are presented side by side with differences and consequences, one reasoned recommendation is given, then the user chooses; fully automatic only when the user asks for it.
+- `references/setup.md` "Before you begin": look at an existing project before advising; eight cold-start questions for a new project, asked in one round, each mapped to the setup steps whose recommendations depend on it.
+
 ## [1.1.0] – 2026-09-04
 
 ### Added

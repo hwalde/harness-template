@@ -18,7 +18,7 @@ compatibility: >-
   Copilot and hermes. Needs git and python3. freilauf (optional) runs on Linux only.
 metadata:
   author: Herbert Walde
-  version: "1.1.0"
+  version: "1.2.0"
   homepage: https://github.com/hwalde/harness-skill
 ---
 
@@ -52,6 +52,30 @@ freilauf branch; step Z closes every route that changed a file.
 6. **Whenever you create or edit a script** – for a project or for this skill – you need
    `references/scripts.md` first: the ten binding principles, and the rule that shipped and
    templated scripts are drafts you write, test for real and improve, never copy as they are.
+
+## The working style – a guided process, never a finished harness out of nowhere
+
+Unless the user explicitly asks for a fully automatic run, every route that changes the
+harness is a **conversation about decisions**, not a build you present at the end. The user
+owns the decisions (which agents, which knowledge store, which access, which red lines, which
+scripts); you own the advice. For every decision:
+
+1. **Explain in plain language what it is about** – one or two sentences a person who has
+   never heard the term can follow; no jargon without a gloss.
+2. **Present the options side by side**: what each one is, how they differ, and what each
+   one costs and brings – context, effort, maintenance, risk, what becomes possible, what
+   becomes impossible. A table or a short list, never a wall of prose.
+3. **Give one reasoned recommendation** and say why it fits *this* project, and when the
+   other option would be the better one.
+4. **Then let the user choose** (question tool if your agent has one, otherwise as text) and
+   wait. Do not decide for them, do not batch five decisions into one question, do not carry
+   on "provisionally". Record the choice immediately (rule of two places, step 0).
+
+To advise well you must know the project: **before the first recommendation, look at an
+existing project** – repository layout, build and test system, languages, existing rule
+files and docs, CI, what runs where (setup step 1 lists what to look for). For a project that
+does not exist yet, the cold-start questions in `references/setup.md` ("Before you begin")
+gather what the recommendations depend on; ask them first, in one round, then advise.
 
 ## Step 1 – Classify the assignment and pick the route
 

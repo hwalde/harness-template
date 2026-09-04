@@ -130,8 +130,11 @@ Set-Location (Join-Path $PSScriptRoot "..")
 # Usage errors exit 2 (printed to stderr) before $ErrorActionPreference = "Stop" would turn
 # them into exit 1.
 if ($args.Count -eq 0) {{
-    Get-Content $PSCommandPath | Where-Object {{ $_ -match '^#' }} |
-        ForEach-Object {{ $_ -replace '^# ?', '' }}
+    # The header is the contiguous comment block at the top; stop at the first other line.
+    foreach ($line in Get-Content $PSCommandPath) {{
+        if ($line -notmatch '^#') {{ break }}
+        $line -replace '^# ?', ''
+    }}
     exit 2
 }}
 if (-not (Get-Command psmux -ErrorAction SilentlyContinue)) {{
@@ -167,6 +170,8 @@ WIN_ATTACH = """\
 #   tools\\{name}.ps1 NAME "text"     type text into the run, submit it, then attach
 # Runs are started with tools\\{start}.ps1; ended with: python tools\\agent-start.py kill NAME
 Set-Location (Join-Path $PSScriptRoot "..")
+if ($args.Count -gt 2) {{ [Console]::Error.WriteLine("Usage: tools\\{name}.ps1 [NAME ['text']]"); exit 2 }}
+$ErrorActionPreference = "Stop"   # a missing python must fail loudly, not exit 0
 
 switch ($args.Count) {{
     0 {{ & python tools\\agent-start.py list; exit $LASTEXITCODE }}
@@ -174,7 +179,6 @@ switch ($args.Count) {{
     2 {{ & python tools\\agent-start.py send $args[0] $args[1]
          if ($LASTEXITCODE -ne 0) {{ exit $LASTEXITCODE }}
          & python tools\\agent-start.py attach $args[0]; exit $LASTEXITCODE }}
-    default {{ [Console]::Error.WriteLine("Usage: tools\\{name}.ps1 [NAME ['text']]"); exit 2 }}
 }}
 """
 

@@ -10,6 +10,9 @@ All notable changes to the `harness` skill. The format follows [Keep a Changelog
 - `tools/agent-start.py`: pre-confirms Claude Code's "Do you trust this folder?" dialog in `~/.claude.json` (the way freilauf's `fl-start` does) – the first real test of the generated scripts hung there; `--no-trust` switches it off.
 - Rule in `scripts.md`, `autonomous-runs.md` and `SKILL.md`: shipped and generated scripts are drafts – tested for real against the installed agent, fixed, then recorded.
 
+### Fixed (before release, found by the evaluator)
+- Windows wrappers: argument slicing past the last index, usage errors exiting 1 instead of 2, header print running into implementation comments, attach script exiting 0 when `python` is missing. POSIX wrapper: empty argument array on bash 3.2. Generator no longer leaves `tools/__pycache__` in the project.
+
 ### Migration
 Take the new `tools/agent-start.py` (`build.py --check`, then `--force tools/agent-start.py` unless the project changed it). Existing projects without freilauf: offer the start/attach scripts (setup step 6 item 7).
 

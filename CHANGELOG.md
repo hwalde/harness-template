@@ -5,13 +5,13 @@ All notable changes to the `harness` skill. The format follows [Keep a Changelog
 ## [1.1.0] – 2026-09-04
 
 ### Added
-- `scripts/make-start-scripts.py` – generates named start/attach scripts per coding agent and OS into a project's `tools/` (`claude-background-start`, `claude-attach`, …; bash + tmux for Linux/macOS, PowerShell + psmux for Windows) as thin wrappers around `tools/agent-start.py`; each header states the exact command line, the purpose (long-running tasks without permission prompts, in the background) and the difference to freilauf.
-- Setup step 6 item 7: when freilauf is not used, the scripts are offered after the purpose was explained; OS and agents are asked; every generated script is tested with a real run before it is recorded.
+- `assets/start-scripts/` – templates (with README: placeholders and procedure) from which the agent writes named start/attach scripts per coding agent and OS into a project's `tools/` (`claude-background-start`, `claude-attach`, …; bash + tmux for Linux/macOS, PowerShell + psmux for Windows) as thin wrappers around `tools/agent-start.py`; each header states the exact command line, the purpose (long-running tasks without permission prompts, in the background) and the difference to freilauf. Deliberately no generator: scripts are written, tested and improved by the agent.
+- Setup step 6 item 7: when freilauf is not used, the scripts are offered after the purpose was explained; OS and agents are asked; every script is tested with a real run before it is recorded.
 - `tools/agent-start.py`: pre-confirms Claude Code's "Do you trust this folder?" dialog in `~/.claude.json` (the way freilauf's `fl-start` does) – the first real test of the generated scripts hung there; `--no-trust` switches it off.
-- Rule in `scripts.md`, `autonomous-runs.md` and `SKILL.md`: shipped and generated scripts are drafts – tested for real against the installed agent, fixed, then recorded.
+- Rule in `scripts.md`, `autonomous-runs.md` and `SKILL.md` step 0: whoever creates or edits a script reads `references/scripts.md` first; shipped scripts and templates are drafts – written by the agent, tested for real against the installed agent, improved, then recorded.
 
 ### Fixed (before release, found by the evaluator)
-- Windows wrappers: argument slicing past the last index, usage errors exiting 1 instead of 2, header print running into implementation comments, attach script exiting 0 when `python` is missing. POSIX wrapper: empty argument array on bash 3.2. Generator no longer leaves `tools/__pycache__` in the project.
+- Windows templates: argument slicing past the last index, usage errors exiting 1 instead of 2, header print running into implementation comments, attach script exiting 0 when `python` is missing. POSIX template: empty argument array on bash 3.2.
 
 ### Migration
 Take the new `tools/agent-start.py` (`build.py --check`, then `--force tools/agent-start.py` unless the project changed it). Existing projects without freilauf: offer the start/attach scripts (setup step 6 item 7).

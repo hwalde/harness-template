@@ -94,11 +94,13 @@ Some results only a human can accept. Then it pays to place the final acceptance
 `tools/agent-start.py` is generic: agent, mode, multiplexer, all behind flags. A human who wants
 to hand a long-running task to an agent should not have to remember them – one command per
 agent, with a name that says what it does: `tools/claude-background-start "task"` and
-`tools/claude-attach [NAME]`, likewise `opencode-…`, `codex-…`. The skill generates them:
-`python3 <skill>/scripts/make-start-scripts.py <project> --agents claude,opencode --os linux,macos,windows`.
-Linux and macOS share one bash script (tmux); Windows gets PowerShell scripts (psmux). They are
-thin wrappers around `agent-start.py`, so the no-questions flags stay in one table; each header
-repeats the exact command line, the purpose, and the difference to freilauf.
+`tools/claude-attach [NAME]`, likewise `opencode-…`, `codex-…`. **The agent writes them**, from
+the templates in `assets/start-scripts/` of the skill (its README lists the placeholders and the
+procedure): one pair per agent, bash + tmux for Linux/macOS, PowerShell + psmux for Windows.
+There is deliberately no generator – a script the agent wrote, ran and fixed is understood,
+matches the installed agent version and carries the project's own pre-checks and defaults.
+They are thin wrappers around `agent-start.py`, so the no-questions flags stay in one table;
+each header states the exact command line, the purpose, and the difference to freilauf.
 
 **Explain the purpose before offering them** – the user must know why they exist: a run that
 nobody sits in front of dies at the first permission prompt and at the first closed terminal.
@@ -111,13 +113,14 @@ by hand, watched by the human. freilauf is the hub above the projects: schedules
 worktree per run, budget gates, a finish gate, merge, notifications. Whoever needs that
 installs freilauf (step F of `SKILL.md`) and does not need these scripts.
 
-**Generated scripts are drafts, never finished goods.** The flags in the table are a dated
-snapshot; a coding agent changes its CLI between versions, a fresh checkout raises a dialog the
-table did not foresee (Claude Code's "Do you trust this folder?" hung the first real test of
-these scripts – `agent-start.py` now pre-confirms it in `~/.claude.json`, the way freilauf's
-`fl-start` does). So, for every agent and OS the user wants: check the mode against the
-installed version (`<agent> --help`, the docs), run a **real** short task through the
-generated script (not only `--dry-run`), attach, read the screen, end the run – and fix the
+**Templates are drafts, never finished goods.** The flags in the table are a dated snapshot;
+a coding agent changes its CLI between versions, a fresh checkout raises a dialog the table did
+not foresee (Claude Code's "Do you trust this folder?" hung the first real test of these
+scripts – `agent-start.py` now pre-confirms it in `~/.claude.json`, the way freilauf's
+`fl-start` does). So, for every agent and OS the user wants: write the script from the
+template, adapt it to the project (default model, pre-checks, prompt-file convention), check
+the mode against the installed version (`<agent> --help`, the docs), run a **real** short
+task through it (not only `--dry-run`), attach, read the screen, end the run – and fix the
 table or the script when it does not behave. Only a script that passed a real run gets its
 sentence in `AGENTS.md`. What cannot be tested on this machine (the Windows scripts on Linux,
 an agent that is not installed) is handed over marked as untested in `HARNESS.md`.

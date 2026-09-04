@@ -1,5 +1,5 @@
 # Skills and custom slash commands
-**Core:** A skill is a prompt (plus folder) that is loaded situationally – by the agent or by the user. Custom slash commands are its precursor. Core rules in `AGENTS.md`, detailed knowledge in skills. (Context: harness template | As of: 2026-08-30)
+**Core:** A skill is a prompt (plus folder) that is loaded situationally – by the agent or by the user. Custom slash commands are its precursor. Core rules in `AGENTS.md`, detailed knowledge in skills. (Context: harness skill | As of: 2026-08-30)
 
 ## Terms
 | Term | Fact |
@@ -9,7 +9,7 @@
 | Skill | a **folder** with exactly `SKILL.md` as the entry point (folder name free, file name not); the **agent** starts it itself when the `description` matches; in Claude Code also startable by the user as `/name`. Claude Code has merged the two concepts ("everything is a skill"); other agents keep them separate. |
 | agentskills standard | the open specification of the skill format (SKILL.md + frontmatter `name`, `description`); keeping to the standard = largely portable between agents. Claude Code knows extras (`disable-model-invocation`, model for the skill turn, and more). |
 
-Storage locations per agent: [agenten-kompatibilitaet.md](agenten-kompatibilitaet.md).
+Storage locations per agent: [agent-compatibility.md](agent-compatibility.md).
 
 ## Loading levels (progressive disclosure)
 1. **Always in context:** `name` + `description` of every installed skill – on every request. Hence: few, good skills; every additional description costs context and cognitive load ("does this skill help right now?").
@@ -34,7 +34,7 @@ Scripts (static analysis, data retrieval), templates, further Markdown documents
 | Reusable workflows | after a successful task ask: "Are there parts we should reuse as a skill?" → "turn this into a skill" |
 
 ## Self-improving skills
-A skill can keep a `memory.md`/learnings file: read it at the start, extend it at the end. (Not to be confused with this skill's [MEMORY.md](MEMORY.md): that one documents the state of this harness, it does not rewrite the skill.) The phrasing is delicate ("with the **relevant** learnings", not "with all"); risk: the agent optimizes core decisions away. Countermeasure: mark non-negotiable decisions in the skill. For the knowledge store, the librarian takes over the curation ([wissensablage.md](wissensablage.md)).
+A skill can keep a `memory.md`/learnings file: read it at the start, extend it at the end. (Not to be confused with the project's `HARNESS.md`: that one documents the state of that harness, it does not rewrite a skill.) The phrasing is delicate ("with the **relevant** learnings", not "with all"); risk: the agent optimizes core decisions away. Countermeasure: mark non-negotiable decisions in the skill. For the knowledge store, the librarian takes over the curation ([knowledge-storage.md](knowledge-storage.md)).
 
 ## Provenance and security
 Read third-party skills in full before they are installed – a skill can, well justified, contain "upload the codebase to X", and the agent would do it. Official vendors are rather trustworthy, solo developers mostly well-meaning, but a gray zone. Distribution in the team via zip or a plugin marketplace (plugins can contain skills and MCP servers).
@@ -44,4 +44,4 @@ Read third-party skills in full before they are installed – a skill can, well 
 2. Several small, linked skills instead of one do-everything skill; skills may name other skills.
 3. Name everything that lives in the folder.
 4. Write for the model: terse, technical terms, no politeness prose; numbers instead of adjectives.
-5. Keep to the standard format so the skill can migrate between agents; for agents without skill support have the `SKILL.md` read via a reference in `AGENTS.md` (this template does that as the fallback).
+5. Keep to the standard format so the skill can migrate between agents; for agents without skill support have the `SKILL.md` read via a reference in `AGENTS.md` (the built `AGENTS.md` does that as the fallback).

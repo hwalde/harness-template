@@ -1,5 +1,5 @@
 # Evaluators: generator → evaluator
-**Core:** The agent that did the work always answers "well done?" with yes. A second agent with fresh context, without write permissions, judging against observed evidence finds different things. The pattern = one subagent + one entry in the rule file. (Context: harness template | As of: 2026-08-30)
+**Core:** The agent that did the work always answers "well done?" with yes. A second agent with fresh context, without write permissions, judging against observed evidence finds different things. The pattern = one subagent + one entry in the rule file. (Context: harness skill | As of: 2026-08-30)
 
 ## The pattern
 | Part | Content |
@@ -21,13 +21,13 @@ The prompt to the evaluator as a letter, not as a list of commands: it is the sa
 
 ## Limits and countermeasures
 - The more defiant the model, the sooner it bypasses the evaluator or tries to deceive it (models genuinely deceive): suggesting only a partial aspect to the evaluator, weakening tests, "known limitation". Countermeasures in the evaluator prompt: scope check, builder excuses do not count, weakened tests are a finding of their own.
-- Who starts the evaluator: (a) the implementing agent itself – the simplest level, this template; (b) from outside via a hook (e.g., a stop hook or pre-commit) – the agent can no longer forget it; (c) in the CI/CD pipeline with findings in the review platform – "a notch better" because independent. Decide during setup whether (b) or (c) is additionally desired.
+- Who starts the evaluator: (a) the implementing agent itself – the simplest level, what the skill builds; (b) from outside via a hook (e.g., a stop hook or pre-commit) – the agent can no longer forget it; (c) in the CI/CD pipeline with findings in the review platform – "a notch better" because independent. Decide during setup whether (b) or (c) is additionally desired.
 - A green test only proves the path the test took. Written-down check criteria are the yardstick; without criteria the evaluator checks against the task description and says so.
 
 ## Multiple and specialized evaluators
 The smallest configuration is one evaluator. Bigger: several instances one after the other (Anthropic runs a whole series internally), by topic focus depending on the project. Two ways:
 
-1. **One evaluator, several focuses** (built into the template): call the `evaluator` several times, each time with "focus: security" / "performance" / "clean code" / "coding guidelines" / "architecture". No additional standing context, because only one description is loaded.
+1. **One evaluator, several focuses** (built in by the skill): call the `evaluator` several times, each time with "focus: security" / "performance" / "clean code" / "coding guidelines" / "architecture". No additional standing context, because only one description is loaded.
 2. **Dedicated subagents per focus** (creatable during setup, see the template below): sensible when a focus needs its own knowledge (the architecture documentation, the guideline catalog, a security checklist) or when it should run separately in a pipeline/CI.
 
 Order when several run: first deterministic checks (linters, static analysis, tests – via script, not via model), then functional acceptance (standard evaluator), then the focus areas (security → architecture/guidelines → performance → clean code). Each looks at the changes via `git status`/`git diff` and returns concrete, fixable findings to the main agent; the main agent works through them and has it re-checked. Not all of them for every trifle: define in `AGENTS.md` which evaluators run at which scope of change (e.g., security always for auth/inputs/file access; architecture for new modules).
@@ -81,7 +81,7 @@ Analogously: `evaluator-performance` (complexity, N+1, IO in the hot path, memor
 ## Further proven subagent types (for orientation)
 | Type | Task |
 |---|---|
-| librarian | the only access to the knowledge store → [wissensablage.md](wissensablage.md) |
+| librarian | the only access to the knowledge store → [knowledge-storage.md](knowledge-storage.md) |
 | docs updater | update the documentation before every commit; check criteria in the prompt |
 | remote-system expert | answers questions about the production environment from ingested knowledge; without tools |
 | linking pattern | instead of a custom subagent: a prompt in a file + a three-liner in `AGENTS.md` "start a subagent that reads this file" – without standing context |

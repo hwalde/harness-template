@@ -1,11 +1,11 @@
 # Workflow: from assignment to accepted work
-**Core:** A standard workflow in `AGENTS.md` fixes the order: gather prior knowledge → plan (as much as needed) → implement with deterministic checks → evaluator loop → update documentation and wiki. The counterpole to a lot of planning is a terse goal with a check criterion. (Context: harness template | As of: 2026-08-30)
+**Core:** A standard workflow in `AGENTS.md` fixes the order: gather prior knowledge → plan (as much as needed) → implement with deterministic checks → evaluator loop → update documentation and wiki. The counterpole to a lot of planning is a terse goal with a check criterion. (Context: harness skill | As of: 2026-08-30)
 
 ## The standard workflow (a suggestion for `AGENTS.md`, tailor during setup)
 1. **Prior knowledge:** librarian QUERY with the intention; read linked documents that touch the topic (subfolder rule files the agent loads situationally).
 2. **Plan as much as needed** (levels below). Write acceptance criteria in checkable form – they are the evaluator's yardstick.
 3. **Implement.** The deterministic via script: formatting, linters, static analysis, tests, build. For web/desktop apps look for yourself in between (browser/desktop control), at the end run repeatable tests.
-4. **Acceptance:** evaluator with criteria, diff, and evidence; on `NEEDS_WORK` rework and re-check until `PASS`. Focus evaluators by scope of change ([evaluatoren.md](evaluatoren.md)).
+4. **Acceptance:** evaluator with criteria, diff, and evidence; on `NEEDS_WORK` rework and re-check until `PASS`. Focus evaluators by scope of change ([evaluators.md](evaluators.md)).
 5. **Follow-up:** update documentation/specification; ingest the lasting via the librarian (only what a future session needs); one sentence in `AGENTS.md` when it was needed for the umpteenth time; release/deploy only via the script designated for it.
 
 That is the order, not a form: a one-line fix needs no plan, but every change needs the acceptance.
@@ -20,7 +20,7 @@ That is the order, not a form: a one-line fix needs no plan, but every change ne
 
 From this the cycle **read document → work → update document**: the requirements or plan document remains the continuously updated knowledge source for the next chat or subagent.
 
-**Counterpole (preferred where possible):** goal + check criterion instead of a process plan. "The pipeline must cost under 10 dollars; check that via the cost query at X." The prompt work does not disappear, it moves from the procedure into the goal and the criterion ([autonome-laeufe.md](autonome-laeufe.md)). Frameworks that elicit requirements (Spec-Kit-like) are training wheels – useful as long as you are unpracticed.
+**Counterpole (preferred where possible):** goal + check criterion instead of a process plan. "The pipeline must cost under 10 dollars; check that via the cost query at X." The prompt work does not disappear, it moves from the procedure into the goal and the criterion ([autonomous-runs.md](autonomous-runs.md)). Frameworks that elicit requirements (Spec-Kit-like) are training wheels – useful as long as you are unpracticed.
 
 **Pre-workflow:** ticket + braindump (everything the agent cannot know: meetings, direction, concerns, your own questions) → 3–8 subagents in parallel as information gatherers ("how did we build X, would a refactoring be needed?") → have the agent propose solution paths, the human decides. The chat is then "a garbage dump with pearls"; from level 2 on, only the pearls are passed on.
 
@@ -37,7 +37,7 @@ From this the cycle **read document → work → update document**: the requirem
 - Context: write it in, have it fetched (and say where), or – harness – have it fetch it itself.
 - Examples sparingly with top models (the source code is the example: "like the user service"); plentifully with small models.
 - Prescribe the approach only when your own observation stands behind it; otherwise name the capability ("use subagents") and leave the deployment to it.
-- Behavior for the unforeseen: boundaries and abort conditions ([autonome-laeufe.md](autonome-laeufe.md)).
+- Behavior for the unforeseen: boundaries and abort conditions ([autonomous-runs.md](autonomous-runs.md)).
 - Name tools explicitly (demand or forbid); limit outward actions ("fill in, do not submit").
 - Frame third-party text in XML tags; "format, do not rewrite"; "write one to one into a file".
 - Assignments to other instances/subagents as a **letter**, not a list of commands: "Consider that the instance is the same model as you and will fully engage with this – leave it room to think."

@@ -22,7 +22,7 @@ Differences between the two formats:
 
 Other agents: some are said to read .claude/agents/ directly (e.g. Cursor),
 GitHub Copilot uses .github/agents/*.agent.md - verify against the current
-documentation during setup (harness skill, agenten-kompatibilitaet.md) before
+documentation during setup (harness skill, references/agent-compatibility.md) before
 adding a target here.
 """
 

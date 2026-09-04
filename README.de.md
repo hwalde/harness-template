@@ -45,7 +45,8 @@ references/               Zwölf Dokumente – was ein Harness braucht, Regeldat
                           Skripte, autonome Läufe, Workflow, Agentenkompatibilität, freilauf, die Einrichtung
 assets/project/           Alles, was ein Projekt bekommt, am Zielpfad
 scripts/build.py          Baut (oder prüft) ein Projekt gegen die Vorlagen – idempotent, überschreibt nie
-scripts/make-start-scripts.py  Benannte Start-/Attach-Skripte je Agent und Betriebssystem, für Projekte ohne Freilauf
+scripts/make-start-scripts.py
+                         Benannte Start-/Attach-Skripte je Agent und Betriebssystem, für Projekte ohne Freilauf
 CHANGELOG.md              Was sich pro Version geändert hat, und was ein gebautes Projekt von Hand braucht
 ```
 

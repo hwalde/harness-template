@@ -158,7 +158,9 @@ def trust_workdir(agent, directory, disabled):
     reading docs). Pre-confirm it the way freilauf's fl-start does: set
     projects[<dir>].hasTrustDialogAccepted in ~/.claude.json. Fails soft: on any problem the
     run still starts and the message says what to do. Other agents: nothing to do (cursor
-    gets --trust in its command line)."""
+    gets --trust in its command line). Read-modify-write of ~/.claude.json, as in fl-start:
+    a Claude Code session writing the file at the same moment wins or loses - the backup
+    is the mitigation - and the file is re-indented."""
     if agent != "claude" or disabled:
         return
     cfg = Path.home() / ".claude.json"

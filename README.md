@@ -45,7 +45,8 @@ references/              Twelve documents – what a harness needs, rule files, 
                          scripts, autonomous runs, workflow, agent compatibility, freilauf, the setup
 assets/project/          Everything a project receives, at its target path
 scripts/build.py         Builds (or checks) a project against the templates – idempotent, never overwrites
-scripts/make-start-scripts.py  Named start/attach scripts per agent and OS, for projects without freilauf
+scripts/make-start-scripts.py
+                         Named start/attach scripts per agent and OS, for projects without freilauf
 CHANGELOG.md             What changed per version, and what a built project needs by hand
 ```
 

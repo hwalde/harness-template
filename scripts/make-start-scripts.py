@@ -87,7 +87,8 @@ case "$1" in
     -*) ;;
     *)  args+=(--prompt "$1"); shift ;;
 esac
-exec python3 tools/agent-start.py start --agent {agent} "${{args[@]}}" "$@"
+# ${{args[@]+...}}: an empty array under 'set -u' is an error on bash 3.2 (stock macOS).
+exec python3 tools/agent-start.py start --agent {agent} ${{args[@]+"${{args[@]}}"}} "$@"
 """
 
 POSIX_ATTACH = """\
@@ -124,28 +125,35 @@ WIN_START = """\
 #   tools\\{name}.ps1 "task text" [--name NAME] [--model M] [--attach] [--dry-run] [--no-trust]
 #   tools\\{name}.ps1 -f task.md   [--name NAME] [--model M] [--attach] [--dry-run] [--no-trust]
 # Afterwards:  tools\\{attach}.ps1 [NAME]     (watch, steer, or list the runs)
-$ErrorActionPreference = "Stop"
 Set-Location (Join-Path $PSScriptRoot "..")
 
+# Usage errors exit 2 (printed to stderr) before $ErrorActionPreference = "Stop" would turn
+# them into exit 1.
 if ($args.Count -eq 0) {{
-    Get-Content $PSCommandPath | Select-Object -Skip 1 | Where-Object {{ $_ -match '^#' }} |
+    Get-Content $PSCommandPath | Where-Object {{ $_ -match '^#' }} |
         ForEach-Object {{ $_ -replace '^# ?', '' }}
     exit 2
 }}
 if (-not (Get-Command psmux -ErrorAction SilentlyContinue)) {{
-    Write-Error "psmux is not installed - the run would have no session to attach to. Install psmux ({install_hint}) or start headless: python tools\\agent-start.py start --agent {agent} --headless --prompt '...'"
+    [Console]::Error.WriteLine("psmux is not installed - the run would have no session to attach to. Install psmux ({install_hint}) or start headless: python tools\\agent-start.py start --agent {agent} --headless --prompt '...'")
     exit 2
 }}
 
+# Split off the task argument; the rest is passed through. The last valid index of $args
+# is Count-1, and a range past it is an error - hence the guards.
 $pass = @()
+$rest = @()
 if ($args[0] -eq "-f") {{
-    if ($args.Count -lt 2) {{ Write-Error "-f needs a file"; exit 2 }}
-    $pass += @("--prompt-file", $args[1]); $rest = $args[2..($args.Count)]
+    if ($args.Count -lt 2) {{ [Console]::Error.WriteLine("-f needs a file"); exit 2 }}
+    $pass = @("--prompt-file", $args[1])
+    if ($args.Count -gt 2) {{ $rest = $args[2..($args.Count - 1)] }}
 }} elseif ($args[0] -notlike "-*") {{
-    $pass += @("--prompt", $args[0]); $rest = $args[1..($args.Count)]
+    $pass = @("--prompt", $args[0])
+    if ($args.Count -gt 1) {{ $rest = $args[1..($args.Count - 1)] }}
 }} else {{
     $rest = $args
 }}
+$ErrorActionPreference = "Stop"
 & python tools\\agent-start.py start --agent {agent} @pass @rest
 exit $LASTEXITCODE
 """
@@ -158,22 +166,22 @@ WIN_ATTACH = """\
 #   tools\\{name}.ps1 NAME            attach to the run (detach again: Ctrl+b, then d)
 #   tools\\{name}.ps1 NAME "text"     type text into the run, submit it, then attach
 # Runs are started with tools\\{start}.ps1; ended with: python tools\\agent-start.py kill NAME
-$ErrorActionPreference = "Stop"
 Set-Location (Join-Path $PSScriptRoot "..")
 
 switch ($args.Count) {{
     0 {{ & python tools\\agent-start.py list; exit $LASTEXITCODE }}
     1 {{ & python tools\\agent-start.py attach $args[0]; exit $LASTEXITCODE }}
     2 {{ & python tools\\agent-start.py send $args[0] $args[1]
+         if ($LASTEXITCODE -ne 0) {{ exit $LASTEXITCODE }}
          & python tools\\agent-start.py attach $args[0]; exit $LASTEXITCODE }}
-    default {{ Write-Error "Usage: tools\\{name}.ps1 [NAME ['text']]"; exit 2 }}
+    default {{ [Console]::Error.WriteLine("Usage: tools\\{name}.ps1 [NAME ['text']]"); exit 2 }}
 }}
 """
 
 INSTALL_HINT = {
     "linux": "apt install tmux / dnf install tmux",
     "macos": "brew install tmux",
-    "windows": "psmux, a tmux clone for Windows - see its README on GitHub",
+    "windows": "a tmux clone for Windows - see its README on GitHub",
 }
 
 
@@ -183,6 +191,7 @@ def load_agent_start(project: pathlib.Path):
         raise SystemExit(f"{path} is missing - build the harness first (scripts/build.py {project}).")
     spec = importlib.util.spec_from_file_location("agent_start", path)
     mod = importlib.util.module_from_spec(spec)
+    sys.dont_write_bytecode = True   # no tools/__pycache__ in the project from this import
     spec.loader.exec_module(mod)  # type: ignore[union-attr]
     return mod
 
@@ -267,8 +276,13 @@ def main() -> int:
         print("  1. Verify the flags against the installed agents: for each one, --help (or its docs) must")
         print("     still know the mode in the 'Launches' line; else fix the table in tools/agent-start.py")
         print("     and rerun with --force.")
-        print("  2. Dry run: tools/<agent>-background-start \"test\" --dry-run   (Windows: the .ps1)")
-        print("  3. One sentence per script pair in AGENTS.md under 'Tools and scripts', e.g.:")
+        print("  2. Test each script for REAL - a dry run is not enough (the trust dialog only shows in a")
+        print("     real start): tools/<agent>-background-start \"Reply with the word OK only.\" --name t1,")
+        print("     then tools/<agent>-attach t1 (or read the screen: tmux capture-pane -p -t hx-t1:), check")
+        print("     that the agent answered and no dialog is waiting, then: python3 tools/agent-start.py kill t1.")
+        print("     Windows: the same with the .ps1 files and psmux. What you cannot test here (an OS or an")
+        print("     agent that is not installed) is handed over marked as untested in HARNESS.md.")
+        print("  3. Only a script that passed goes into AGENTS.md under 'Tools and scripts', one sentence per pair, e.g.:")
         for agent in agents:
             print(f"     - `tools/{agent}-background-start` / `tools/{agent}-attach` - start {AGENT_LABEL[agent]} for a")
             print(f"       long-running task without permission prompts in a tmux/psmux session, and attach to it;")

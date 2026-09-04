@@ -45,7 +45,8 @@ references/              十二篇文档——一个 harness 需要什么、规�
                          自主运行、工作流程、智能体兼容性、freilauf、安装指南
 assets/project/          项目会收到的一切内容，均位于其目标路径
 scripts/build.py         依照模板构建（或检查）项目——具有幂等性，绝不覆盖
-scripts/make-start-scripts.py  按智能体和操作系统命名的启动/接入脚本，供不使用 freilauf 的项目使用
+scripts/make-start-scripts.py
+                         按智能体和操作系统命名的启动/接入脚本，供不使用 freilauf 的项目使用
 CHANGELOG.md             各版本的变更内容，以及已构建项目需要手动处理的事项
 ```
 

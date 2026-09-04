@@ -16,7 +16,7 @@ A harness is everything except the language model: the environment the agent run
 
 - **Every result is checked by a second pair of eyes.** The `evaluator` subagent reads specification, diff and evidence in a fresh context, with no write access, and answers `PASS` or `NEEDS_WORK`. The builder never accepts its own work.
 - **Knowledge survives the session.** The `librarian` is the only door to an LLM wiki in the repository: decisions with their reasons, pitfalls, operational knowledge – filtered, so the context stays lean.
-- **Runs never stall.** Permission modes for no-questions runs, a start script for tmux/psmux sessions, usage tracking, self-monitoring, and the rule "question round first, then the goal".
+- **Runs never stall.** Permission modes for no-questions runs, named start and attach scripts per agent and OS (`claude-background-start`, `claude-attach`) for long-running tasks in tmux/psmux sessions, usage tracking, self-monitoring, and the rule "question round first, then the goal".
 - **Red lines are written down.** What the agent may read, execute and never touch without approval lives in `AGENTS.md`, and the decision behind it in `HARNESS.md` – so an unattended run in a company project stays inside the corridor you set.
 - **It fits every coding agent.** Claude Code out of the box; opencode generated; Codex, Gemini CLI, Cursor, Copilot, hermes wired up at setup time, when the agent investigates what each of them currently supports.
 
@@ -45,6 +45,7 @@ references/              Twelve documents – what a harness needs, rule files, 
                          scripts, autonomous runs, workflow, agent compatibility, freilauf, the setup
 assets/project/          Everything a project receives, at its target path
 scripts/build.py         Builds (or checks) a project against the templates – idempotent, never overwrites
+scripts/make-start-scripts.py  Named start/attach scripts per agent and OS, for projects without freilauf
 CHANGELOG.md             What changed per version, and what a built project needs by hand
 ```
 

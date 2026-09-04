@@ -11,6 +11,7 @@ tmux/psmux session (to watch and attach) or into a detached background process
 with a log file (headless).
 """
 
+import json
 import os
 import shlex
 import shutil
@@ -151,6 +152,35 @@ def headless_runs():
     return rows
 
 
+def trust_workdir(agent, directory, disabled):
+    """Claude Code asks 'Do you trust this folder?' on the first start in a directory and
+    waits for Enter - an unattended run hangs there forever (found by a real test, not by
+    reading docs). Pre-confirm it the way freilauf's fl-start does: set
+    projects[<dir>].hasTrustDialogAccepted in ~/.claude.json. Fails soft: on any problem the
+    run still starts and the message says what to do. Other agents: nothing to do (cursor
+    gets --trust in its command line)."""
+    if agent != "claude" or disabled:
+        return
+    cfg = Path.home() / ".claude.json"
+    if not cfg.is_file():
+        return
+    try:
+        data = json.loads(cfg.read_text(encoding="utf-8"))
+        proj = data.setdefault("projects", {}).setdefault(str(directory), {})
+        if proj.get("hasTrustDialogAccepted"):
+            return
+        proj["hasTrustDialogAccepted"] = True
+        backup = cfg.with_name(".claude.json.bak-agent-start")
+        shutil.copy2(cfg, backup)
+        tmp = cfg.with_name(".claude.json.tmp-agent-start")
+        tmp.write_text(json.dumps(data, indent=2), encoding="utf-8")
+        tmp.replace(cfg)
+        print(f"Trust dialog pre-confirmed for {directory} (~/.claude.json, backup {backup.name}).")
+    except (OSError, ValueError) as exc:
+        print(f"Note: could not pre-confirm the trust dialog ({exc}). If the run stays on "
+              f"'Do you trust this folder?', attach once and press Enter.")
+
+
 def read_prompt(args):
     if args.get("prompt") and args.get("prompt_file"):
         raise SystemExit("Abort: --prompt and --prompt-file are mutually exclusive. Drop one of them.")
@@ -221,6 +251,7 @@ def cmd_start(args):
         return
 
     RUNS_DIR.mkdir(parents=True, exist_ok=True)
+    trust_workdir(agent, directory, args.get("no_trust"))
     if prompt:
         (RUNS_DIR / f"{name}.prompt.md").write_text(prompt + "\n", encoding="utf-8")
 
@@ -356,6 +387,7 @@ START_HELP = """agent-start.py start [options]
   --headless             Do not use tmux/psmux; detached background process with log file
   --attach               Attach right after starting (multiplexer only)
   --dry-run              Only show what would be started
+  --no-trust             claude: do not pre-confirm the "trust this folder" dialog
 
 Without a prompt (and with a multiplexer) a normal interactive session starts.
 Without a multiplexer a prompt is required; the agent then runs headless.
@@ -373,7 +405,7 @@ def parse(argv):
                 raise SystemExit(f"Abort: {a} needs a value.")
             args[a[2:].replace("-", "_")] = argv[i + 1]
             i += 2
-        elif a in ("--headless", "--attach", "--dry-run"):
+        elif a in ("--headless", "--attach", "--dry-run", "--no-trust"):
             args[a[2:].replace("-", "_")] = True
             i += 1
         elif a in ("-h", "--help"):

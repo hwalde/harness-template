@@ -155,8 +155,23 @@ Read [autonomous-runs.md](autonomous-runs.md) and [freilauf.md](freilauf.md).
      configuring it, and record the resulting configuration in `HARNESS.md` – its UI
      and field names change between versions, so what you write down is a dated snapshot, not
      a contract.
-   - If the user does **not** want freilauf, `tools/agent-start.py` plus tmux is the small
-     local edition and nothing else changes.
+   - If the user does **not** want freilauf (or cannot run it – Linux only), continue with
+     item 7.
+7. **Named start/attach scripts per agent and OS – offer them whenever freilauf is not used.**
+   First explain the purpose in the user's words (section "Named start and attach scripts" in
+   [autonomous-runs.md](autonomous-runs.md)): one command that starts an agent for a
+   long-running task without a single permission prompt, in the background where tmux/psmux
+   exists, and one command to attach to it; ordinary work starts the agent normally; freilauf
+   would be the hub above the projects, these scripts are the local edition inside this one.
+   Then ask two things: which operating systems must the scripts support (Linux, macOS,
+   Windows), and which coding agents (from step 2). Generate them with
+   `python3 <skill>/scripts/make-start-scripts.py <project> --agents … --os …`, then **test
+   every generated script for real**: check the mode against the installed agent
+   (`<agent> --help`), start a short real task through the script, attach, read the screen,
+   end the run; fix `tools/agent-start.py`'s table or the script where it does not behave.
+   Generated scripts are drafts – never hand them over untested. One sentence per script pair
+   in `AGENTS.md` under "Tools and scripts" (the generator prints a proposal); what could not
+   be tested on this machine is noted as untested in `HARNESS.md`.
 
 ## Step 7 – Architecture and coding guidelines
 This is the most important content step. Read [rule-files.md](rule-files.md) and [skills-and-commands.md](skills-and-commands.md).
@@ -205,7 +220,7 @@ Read [workflow.md](workflow.md). Agree the standard workflow with the user and w
 - [ ] Wiki decision implemented (skeleton + librarian, or removed + `docs/` sentence)
 - [ ] MCP servers only with a use case, configured project-locally, rule "ALWAYS for X"; secrets not in the repo
 - [ ] Scripts per the ten principles, tested, recorded
-- [ ] `agent-start.py doctor` and `--dry-run` run; permission mode/allow list set up if autonomous runs are desired
+- [ ] `agent-start.py doctor` and `--dry-run` run; permission mode/allow list set up if autonomous runs are desired; without freilauf: named start/attach scripts offered, generated for the chosen OS and agents, tested with a real run, recorded
 - [ ] Security settled: red lines in `AGENTS.md`, the decision with its reason in `HARNESS.md`
 - [ ] `HARNESS.md` reflects the setup: skill version, setup status, agents in use, sync duties, decisions with reasons, deviations, open points
 - [ ] Git repository and remote settled (platform, visibility) or deliberately absent; `build.py --check` clean apart from recorded deviations

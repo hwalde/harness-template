@@ -90,5 +90,37 @@ The agent may extend the skill from which it draws the knowledge for evolving th
 ## Shifting verification to the end
 Some results only a human can accept. Then it pays to place the final acceptance reliably at the end (e.g., a comment function with timestamps whose feedback the agent works through in a targeted way) and not have every little thing checked by screenshot along the way – continuous interim checking is expensive, and edge cases are better left to the human at the end.
 
+## Named start and attach scripts per agent and OS (when freilauf is not used)
+`tools/agent-start.py` is generic: agent, mode, multiplexer, all behind flags. A human who wants
+to hand a long-running task to an agent should not have to remember them – one command per
+agent, with a name that says what it does: `tools/claude-background-start "task"` and
+`tools/claude-attach [NAME]`, likewise `opencode-…`, `codex-…`. The skill generates them:
+`python3 <skill>/scripts/make-start-scripts.py <project> --agents claude,opencode --os linux,macos,windows`.
+Linux and macOS share one bash script (tmux); Windows gets PowerShell scripts (psmux). They are
+thin wrappers around `agent-start.py`, so the no-questions flags stay in one table; each header
+repeats the exact command line, the purpose, and the difference to freilauf.
+
+**Explain the purpose before offering them** – the user must know why they exist: a run that
+nobody sits in front of dies at the first permission prompt and at the first closed terminal.
+The script starts the agent in its no-questions mode (Claude Code `--permission-mode dontAsk`,
+opencode `--auto`, Codex `-a never`, Gemini `--yolo`, cursor `--force --trust`, hermes `--yolo`)
+inside a tmux/psmux session that survives logout; the attach script is the way back in. For
+ordinary interactive work the agent is started normally. **The difference to freilauf:** these
+scripts are the local edition inside one project – one run, in the current checkout, started
+by hand, watched by the human. freilauf is the hub above the projects: schedules, a fresh
+worktree per run, budget gates, a finish gate, merge, notifications. Whoever needs that
+installs freilauf (step F of `SKILL.md`) and does not need these scripts.
+
+**Generated scripts are drafts, never finished goods.** The flags in the table are a dated
+snapshot; a coding agent changes its CLI between versions, a fresh checkout raises a dialog the
+table did not foresee (Claude Code's "Do you trust this folder?" hung the first real test of
+these scripts – `agent-start.py` now pre-confirms it in `~/.claude.json`, the way freilauf's
+`fl-start` does). So, for every agent and OS the user wants: check the mode against the
+installed version (`<agent> --help`, the docs), run a **real** short task through the
+generated script (not only `--dry-run`), attach, read the screen, end the run – and fix the
+table or the script when it does not behave. Only a script that passed a real run gets its
+sentence in `AGENTS.md`. What cannot be tested on this machine (the Windows scripts on Linux,
+an agent that is not installed) is handed over marked as untested in `HARNESS.md`.
+
 ## `tools/agent-start.py` in brief
-`doctor` (which agents/multiplexers are there) · `start --prompt/--prompt-file [--agent] [--name] [--dir] [--model] [--headless] [--attach] [--dry-run]` · `list` · `attach NAME` · `send NAME "Text"` · `kill NAME`. With a multiplexer an interactive session `hx-<name>` is created; without one (or with `--headless`) the agent runs in the background with a log under `.harness/runs/`. The flags per agent live in a table at the top of the script – the only place to adjust when flags change.
+`doctor` (which agents/multiplexers are there) · `start --prompt/--prompt-file [--agent] [--name] [--dir] [--model] [--headless] [--attach] [--dry-run] [--no-trust]` · `list` · `attach NAME` · `send NAME "Text"` · `kill NAME`. With a multiplexer an interactive session `hx-<name>` is created; without one (or with `--headless`) the agent runs in the background with a log under `.harness/runs/`. The flags per agent live in a table at the top of the script – the only place to adjust when flags change.

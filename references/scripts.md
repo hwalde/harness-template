@@ -80,6 +80,9 @@ gate then cannot be mistaken for an acceptance. The reverse duty matters just as
 of the evaluators whatever the script already decides, or a model re-decides a settled question
 and you collect duplicate findings for free.
 
+## Templates and generated scripts are drafts
+A script that the skill ships or generates (`tools/agent-start.py`, the start/attach scripts from `scripts/make-start-scripts.py`) was tested against the agents and versions of one machine on one day. The coding agent it drives changes its flags, dialogs and defaults between versions; the project's shell, OS and multiplexer differ. So every such script is a starting point, never taken over as it is: run it for real in the project (a short task end to end, not only a dry run), read what it prints and what the agent shows, fix what does not fit, and only then record it in `AGENTS.md`. Test it again after the agent was updated – the table at the top of `agent-start.py` is a dated snapshot.
+
 ## Pitfalls
 - The script exists but is mentioned nowhere.
 - A wrapper that prints whole log files (bloat); JSON-blob output; long-runners that block the agent.

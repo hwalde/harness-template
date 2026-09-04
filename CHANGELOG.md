@@ -2,6 +2,17 @@
 
 All notable changes to the `harness` skill. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow [Semantic Versioning](https://semver.org/): templates or procedure changed incompatibly → major, new building block or document → minor, wording → patch. The version lives in `metadata.version` of `SKILL.md`; a project records the version it was built with in its `HARNESS.md`. A **Migration** line says what a project built with an older version needs by hand – everything else route E (`scripts/build.py --check`) carries over.
 
+## [1.1.0] – 2026-09-04
+
+### Added
+- `scripts/make-start-scripts.py` – generates named start/attach scripts per coding agent and OS into a project's `tools/` (`claude-background-start`, `claude-attach`, …; bash + tmux for Linux/macOS, PowerShell + psmux for Windows) as thin wrappers around `tools/agent-start.py`; each header states the exact command line, the purpose (long-running tasks without permission prompts, in the background) and the difference to freilauf.
+- Setup step 6 item 7: when freilauf is not used, the scripts are offered after the purpose was explained; OS and agents are asked; every generated script is tested with a real run before it is recorded.
+- `tools/agent-start.py`: pre-confirms Claude Code's "Do you trust this folder?" dialog in `~/.claude.json` (the way freilauf's `fl-start` does) – the first real test of the generated scripts hung there; `--no-trust` switches it off.
+- Rule in `scripts.md`, `autonomous-runs.md` and `SKILL.md`: shipped and generated scripts are drafts – tested for real against the installed agent, fixed, then recorded.
+
+### Migration
+Take the new `tools/agent-start.py` (`build.py --check`, then `--force tools/agent-start.py` unless the project changed it). Existing projects without freilauf: offer the start/attach scripts (setup step 6 item 7).
+
 ## [1.0.0] – 2026-09-04
 
 First release as a skill. Until now this repository was `harness-template`: a project starter you copied, detached from its origin and then could not update. It is now a skill that *builds* the harness into a project and stays a plain git clone, so `git pull` keeps it current.

@@ -55,7 +55,7 @@ freilauf branch; step Z closes every route that changed a file.
 | If the user … | then route |
 |---|---|
 | wants a harness in a project that has none (no `HARNESS.md`), or the offer below accepted | **A – Build and set up** |
-| has a built harness whose setup is not finished (`HARNESS.md` says so, or the setup paragraph is still in `AGENTS.md`) | **A** from `references/setup.md` step 1 |
+| has a built harness whose setup is not finished (`HARNESS.md` says so, or the setup paragraph is still in `AGENTS.md`) | **A** from step 3 on, resuming `references/setup.md` at the first step its "Setup status" does not record as done |
 | wants a project's harness brought up to the current skill version | **E – Update** |
 | wants a single building block created or changed (script, subagent/evaluator, skill, MCP entry, rule file, wiki/librarian, permission/run setup) | **C – One building block** |
 | wants the harness as a whole reviewed, improved, extended or restructured | **D – Review and extend** |

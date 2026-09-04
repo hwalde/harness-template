@@ -3,6 +3,17 @@
 
 ## Before you begin
 - You have read **all** documents of this skill (`references/index.md` → every file). Half-knowledge is dangerous: the decisions below presuppose the connections.
+- **Guided, not automatic** (the working style in `SKILL.md`): every step is a decision the user takes after you explained, in plain language, what it is about, what the options are with their differences and consequences, and which one you recommend and why. Present options clearly (table or short list), one decision at a time, then wait for the choice.
+- **Know the project before you advise.** Existing project: look around first (step 1 says what). New or empty project – **cold-start questions**, asked in one round before any recommendation, because most recommendations below hang on the answers:
+  1. What is the project, in one sentence, and what kind of application (CLI, library, web app, desktop app, service/API, data pipeline, mixed)? → MCP servers (step 4), test strategy.
+  2. Who works on it – one person or a team, in-house or with outsiders – and which coding agents do they use? → compatibility (step 2), where the skill is installed (step 0), wiki vs. docs (step 3).
+  3. Where does the code live or should it live (platform, public/private), and is the repository the deliverable itself? → remote (step 0), repository layout (step 1).
+  4. Which languages, frameworks, build and test tools are set or preferred? → scripts (step 5), guidelines (step 7).
+  5. Should agents run unattended, on a schedule, or overnight – and on which operating systems? → autonomous runs, freilauf or start scripts (step 6).
+  6. What must an agent never touch without approval (production, customer data, payments, sending mail, deployments)? → red lines and security (step 6).
+  7. Is there knowledge outside the code an agent will need (operations, access, domain rules, past decisions)? → knowledge store (step 3).
+  8. What has hurt in similar projects before, or what worries the user about letting agents work? → pitfalls, evaluator focus (step 8).
+  Answers you already have from looking at an existing project are not asked again – confirm them in one sentence instead.
 - Working style: step by step, per step present the options with a reasoned recommendation (with your agent's question tool, otherwise as text), await the answer, record the result immediately – **one sentence per note**, technical terms, with a rationale where a rule would otherwise be unintelligible. You replace placeholder comments in `AGENTS.md` with content or remove them.
 - **Two places, no duplication:** `AGENTS.md` is for regular operation – 99 % of the time the agent works WITH the harness, not ON it: project facts, librarian rules, evaluator rules, workflow, operating tools, pitfalls. Everything harness-internal goes into the project's `HARNESS.md`: skill version, setup status, the coding agents in use and what they support, sync duties, decisions with their reasons, deviations from the skill's templates, open points. `HARNESS.md` is loaded only when someone works on the harness – that keeps `AGENTS.md` short. If the project gets a wiki (step 3), `HARNESS.md` remains the authoritative place for the harness state; the same decisions go into the wiki on top, so that a session which never loads this skill still finds them through the librarian.
 - Install nothing the user has not confirmed; write no secrets into files; machine-specific values belong in `CLAUDE.local.md` (gitignored) or environment variables.

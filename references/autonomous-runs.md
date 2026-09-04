@@ -1,8 +1,8 @@
 # Autonomous runs: without follow-up questions, without stopping, without supervision
-**Core:** An autonomous run fails on every question that nobody answers, on every session that dies at logout, and on every limit that silently chokes it. The harness removes all three. (Context: harness template | As of: 2026-08-30)
+**Core:** An autonomous run fails on every question that nobody answers, on every session that dies at logout, and on every limit that silently chokes it. The harness removes all three. (Context: harness skill | As of: 2026-08-30)
 
 ## Building blocks at a glance
-| Building block | What for | Where in the template |
+| Building block | What for | Where in the built harness |
 |---|---|---|
 | No-questions permission mode | the agent never halts to ask | `tools/agent-start.py` knows the mode per agent |
 | Terminal multiplexer (tmux / psmux on Windows) | the run survives logging out; you can attach and watch | `tools/agent-start.py start/attach/send` |
@@ -10,11 +10,11 @@
 | Something that keeps it from stopping before the work is done | the `/goal` command (Claude Code) or a loop | below |
 | Usage tracking | stop before the quota limit instead of dying | usage script, see below |
 | Self-monitoring | detect hanging scripts and lost agents | the agent's cron/loop + a check script |
-| Evaluator | a second one checks the acceptance | [evaluatoren.md](evaluatoren.md) |
+| Evaluator | a second one checks the acceptance | [evaluators.md](evaluators.md) |
 | Sandbox | security via the boundary of the environment, not via deny lists | below |
 | Superstructure for schedules and monitoring from outside | when runs happen regularly unattended | [freilauf.md](freilauf.md) |
 
-## Permission modes (using Claude Code as the example; other agents' counterparts in [agenten-kompatibilitaet.md](agenten-kompatibilitaet.md))
+## Permission modes (using Claude Code as the example; other agents' counterparts in [agent-compatibility.md](agent-compatibility.md))
 | Mode | Behavior |
 |---|---|
 | manual | asks about every little thing, may not even write to files |
@@ -85,7 +85,7 @@ Models want to reach their goal and take the shortest path – normally the buil
 - Model and reasoning effort are not one-time settings: for interim tasks without thinking demand a smaller model and lower effort; for runs in which meta-levels and tools must be understood, the smartest model.
 
 ## Self-improvement (optional)
-The agent may extend the skill from which it draws the knowledge for evolving the system with **relevant** learnings. Risk: it optimizes the skill to pieces and throws core decisions overboard. Countermeasure: mark non-negotiable decisions in the skill as such; "with the relevant learnings", not "with all". A remainder stays surrendered control.
+The agent may extend the skill from which it draws the knowledge for evolving the system with **relevant** learnings. Project-local skills only – never the user-level `harness` clone, which `git pull` keeps current and a local edit would fork; project learnings about the harness go into the project's `HARNESS.md` or wiki. Risk: it optimizes the skill to pieces and throws core decisions overboard. Countermeasure: mark non-negotiable decisions in the skill as such; "with the relevant learnings", not "with all". A remainder stays surrendered control.
 
 ## Shifting verification to the end
 Some results only a human can accept. Then it pays to place the final acceptance reliably at the end (e.g., a comment function with timestamps whose feedback the agent works through in a targeted way) and not have every little thing checked by screenshot along the way – continuous interim checking is expensive, and edge cases are better left to the human at the end.

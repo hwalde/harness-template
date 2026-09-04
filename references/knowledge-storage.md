@@ -1,13 +1,13 @@
 # Knowledge storage: LLM wiki, alternatives, rules
-**Core:** Working with coding agents is to a large extent knowledge management. Only what is not in the source code belongs in the store; every piece of information belongs to exactly one context; whoever runs a store buys a maintenance duty. (Context: harness template | As of: 2026-08-30)
+**Core:** Working with coding agents is to a large extent knowledge management. Only what is not in the source code belongs in the store; every piece of information belongs to exactly one context; whoever runs a store buys a maintenance duty. (Context: harness skill | As of: 2026-08-30)
 
 ## Six ways to give an agent knowledge (freely combinable)
 | Way | Description | When |
 |---|---|---|
 | 1. Link documents from `AGENTS.md` | "Before you start work in this project, check the `docs` folder for a document touching your topic, and read it." Reverse direction: store newly worked-out results there – with an instruction on what is worth storing and what not | small to medium projects, few documents, the team maintains docs anyway |
-| 2. Rule files in subfolders | module-specific knowledge lives with the module and is loaded situationally | domain-cut folder tree + an agent that supports it ([regeldateien.md](regeldateien.md)) |
+| 2. Rule files in subfolders | module-specific knowledge lives with the module and is loaded situationally | domain-cut folder tree + an agent that supports it ([rule-files.md](rule-files.md)) |
 | 3. rules files | path-bound rules (only for `tests/**`, only for `src/ui/**`) | the agent supports rules; rules attach to file types/areas |
-| 4. Skills | knowledge is loaded only when it is needed | guideline catalogs, evolution knowledge, how-tos ([skills-und-commands.md](skills-und-commands.md)) |
+| 4. Skills | knowledge is loaded only when it is needed | guideline catalogs, evolution knowledge, how-tos ([skills-and-commands.md](skills-and-commands.md)) |
 | 5. LLM wiki with librarian | a structured store with a subagent as the only access | knowledge across many systems/repos, decisions with rationale, operational knowledge, domain knowledge; long-lived projects |
 | 6. MCP server / scripts as knowledge source | a Confluence MCP, a script that delivers docs | when the source lies outside; Confluence content is written for humans and often a garbage dump – agents fail on it just the same |
 
@@ -26,7 +26,7 @@ Prerequisite for all of them: **the model must learn about it** – one sentence
 
 Guiding question: **"Will a future session need this?"** When in doubt, do not ingest. The smarter the model, the fewer knowledge documents it needs; with small/local models they are all the more valuable.
 
-## The LLM wiki (Karpathy pattern) in this template
+## The LLM wiki (Karpathy pattern) as the skill builds it
 ```
 .my-memory/
 ├── raw/    immutable originals (append-only)

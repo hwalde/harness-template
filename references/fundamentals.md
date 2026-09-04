@@ -1,5 +1,5 @@
 # Fundamentals: what a harness is and what a good one needs
-**Core:** Everything except the LLM is the harness – the environment the agent runs in: rules, knowledge, tools, scripts, reviewers, autonomy building blocks. The goal is always the same question: how can the agent do this itself, autonomously? (Context: harness template | As of: 2026-08-30)
+**Core:** Everything except the LLM is the harness – the environment the agent runs in: rules, knowledge, tools, scripts, reviewers, autonomy building blocks. The goal is always the same question: how can the agent do this itself, autonomously? (Context: harness skill | As of: 2026-08-30)
 
 ## The term
 - The coding agent itself is already a harness (system prompt, tools, permission modes). The project-specific harness is everything built around it so that runs end well without intervention: rule files, subagents, skills, MCP servers, scripts, knowledge store, launch and monitoring machinery.
@@ -10,19 +10,19 @@
 Rule files, subagents, skills, MCP servers, and scripts control **which information and capabilities sit in the context window when** – neither overtaxing nor undertaxing the model. Two extension paths: natural language (rule files, skills, subagents) and algorithms (scripts, MCP). Everything that sits permanently in the context (descriptions of subagents, skills, MCP tools, rule files) costs on every request – "what do I really want to hold in the model's face all the time?"
 
 ## Checklist: what a good harness needs (a selection, not a mandatory list)
-| Building block | Purpose | In the template |
+| Building block | Purpose | Built by the skill |
 |---|---|---|
-| Written-down requirements and rules | core rules (architecture, workflow, pitfalls) in `AGENTS.md`, the rest linked | `AGENTS.md`, [regeldateien.md](regeldateien.md) |
-| Evaluator | one agent checks another; qualitatively and functionally | `evaluator`, [evaluatoren.md](evaluatoren.md) |
-| Knowledge management | the most critical point: requirements, plans, "how does what work", access | librarian + `.my-memory/`, [wissensablage.md](wissensablage.md) |
-| Enablement | the agent obtains information itself, tests and debugs itself: browser/desktop control, access, scripts, tests | [mcp-und-werkzeuge.md](mcp-und-werkzeuge.md), [skripte.md](skripte.md) |
-| Scripts | deterministic support; output as a prompt | `tools/`, [skripte.md](skripte.md) |
-| Not stopping before the work is done | goal command or loop | [autonome-laeufe.md](autonome-laeufe.md) |
+| Written-down requirements and rules | core rules (architecture, workflow, pitfalls) in `AGENTS.md`, the rest linked | `AGENTS.md`, [rule-files.md](rule-files.md) |
+| Evaluator | one agent checks another; qualitatively and functionally | `evaluator`, [evaluators.md](evaluators.md) |
+| Knowledge management | the most critical point: requirements, plans, "how does what work", access | librarian + `.my-memory/`, [knowledge-storage.md](knowledge-storage.md) |
+| Enablement | the agent obtains information itself, tests and debugs itself: browser/desktop control, access, scripts, tests | [mcp-and-tools.md](mcp-and-tools.md), [scripts.md](scripts.md) |
+| Scripts | deterministic support; output as a prompt | `tools/`, [scripts.md](scripts.md) |
+| Not stopping before the work is done | goal command or loop | [autonomous-runs.md](autonomous-runs.md) |
 | No-questions mode + multiplexer | the run never halts and survives logging out | `tools/agent-start.py` |
-| Usage tracking | stop before the quota limit (only with subscription limits) | [autonome-laeufe.md](autonome-laeufe.md) |
-| Self-monitoring | detect hanging scripts and lost agents (cron/loop) | [autonome-laeufe.md](autonome-laeufe.md) |
-| Self-improvement (optional) | the agent updates skills/docs – with limits | [skills-und-commands.md](skills-und-commands.md) |
-| Security | sandbox instead of a deny list | [autonome-laeufe.md](autonome-laeufe.md) |
+| Usage tracking | stop before the quota limit (only with subscription limits) | [autonomous-runs.md](autonomous-runs.md) |
+| Self-monitoring | detect hanging scripts and lost agents (cron/loop) | [autonomous-runs.md](autonomous-runs.md) |
+| Self-improvement (optional) | the agent updates skills/docs – with limits | [skills-and-commands.md](skills-and-commands.md) |
+| Security | sandbox instead of a deny list | [autonomous-runs.md](autonomous-runs.md) |
 | Workflow | read docs → plan → work → check → update docs/wiki | [workflow.md](workflow.md) |
 | Superstructure | schedules, worktrees, monitoring from outside, merge | [freilauf.md](freilauf.md) |
 

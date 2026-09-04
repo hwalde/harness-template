@@ -1,10 +1,10 @@
 # MCP servers and tools: when MCP, when not
-**Core:** MCP servers give the agent tools (browser, desktop, external systems); they cost context and run with your permissions. The competitor to the MCP server is the script. (Context: harness template | As of: 2026-08-30)
+**Core:** MCP servers give the agent tools (browser, desktop, external systems); they cost context and run with your permissions. The competitor to the MCP server is the script. (Context: harness skill | As of: 2026-08-30)
 
 ## What MCP is (in three sentences)
 - Model Context Protocol: a client-server protocol (not REST). The coding agent is the client, the server a running program that offers functions as "tools".
 - At start the agent reads its configuration, connects, collects the tool list, and appends it to its own tools. When the model calls an MCP tool, the agent forwards the call to the server; the result comes back as text.
-- Configuration = command + arguments + environment variables, at user or project level (file name per agent, see [agenten-kompatibilitaet.md](agenten-kompatibilitaet.md)). MCP servers can **not** be put into a skill; they are distributable via plugins.
+- Configuration = command + arguments + environment variables, at user or project level (file name per agent, see [agent-compatibility.md](agent-compatibility.md)). MCP servers can **not** be put into a skill; they are distributable via plugins.
 
 ## What they cost
 | Cost type | Fact |
@@ -29,7 +29,7 @@ The preliminary question before every extension: **is the task algorithmically d
 | Model strength | small/local models forget scripts → MCP | strong models remember a hint |
 | Packaging | user/project level only, not in a skill; secrets in the configuration | the script lives in the repo or skill folder |
 
-Rule of thumb: **state, remoteness, or daily use → MCP. Everything else → script** ([skripte.md](skripte.md)). An MCP server that recreates an existing CLI command is a mistake.
+Rule of thumb: **state, remoteness, or daily use → MCP. Everything else → script** ([scripts.md](scripts.md)). An MCP server that recreates an existing CLI command is a mistake.
 
 ## Providing is not using
 An installed tool is not used automatically. If it is to be used, that is stated explicitly in `AGENTS.md`: "For X ALWAYS use tool Y" – if needed with the counterpart "NOT Z". Examples: "If a web page cannot be read (fetch blocked), use the Playwright MCP to read it." · "Computer use may be employed to debug the desktop app."
@@ -45,10 +45,10 @@ The goal of enablement: the agent obtains information itself, tests, and looks a
 | Layout/design work | multimodal models see screenshots anyway; a vision server (positions, distances) only on concrete need |
 | Generating images | an image-generation server only if the project needs images |
 | Email | **read-only** (list/read, no send function) – e.g., to check confirmation emails/newsletter sign-ups. Red line: no sending without human approval. |
-| Ticket/wiki/pipeline systems (Jira, Confluence, CI) | check whether a CLI exists; Confluence content is written for humans and often a garbage dump – an agent-friendly wiki ([wissensablage.md](wissensablage.md)) is usually the better source |
+| Ticket/wiki/pipeline systems (Jira, Confluence, CI) | check whether a CLI exists; Confluence content is written for humans and often a garbage dump – an agent-friendly wiki ([knowledge-storage.md](knowledge-storage.md)) is usually the better source |
 
 ## Configuration locations (short version)
-Project-local, so that every clone has the same tools; secrets via environment variables, never in the repo. File names per agent in [agenten-kompatibilitaet.md](agenten-kompatibilitaet.md). Check the context consumption before and after adding.
+Project-local, so that every clone has the same tools; secrets via environment variables, never in the repo. File names per agent in [agent-compatibility.md](agent-compatibility.md). Check the context consumption before and after adding.
 
 ## Pitfalls
 - An MCP server just because it is listed in a directory – without a use case. First the use case, then the server.

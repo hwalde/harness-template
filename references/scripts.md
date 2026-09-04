@@ -1,12 +1,12 @@
 # Scripts for coding agents
-**Core:** Everything algorithmically decidable belongs in a script; the AI decides, the script executes. Every script of this harness is built following the ten principles below – without asking back, they always apply here. (Context: harness template | As of: 2026-08-30)
+**Core:** Everything algorithmically decidable belongs in a script; the AI decides, the script executes. Every script of this harness is built following the ten principles below – without asking back, they always apply here. (Context: harness skill | As of: 2026-08-30)
 
 ## Why scripts
 - **Determinism:** A script delivers the same result every day; an error is a bug that you fix. A model answers one way on some days and another way on others. Example: static code analysis via script, not via "look at the files".
 - **Division of labor:** The AI decides *what* should happen and *where*; the script does it. Everything that can be scripted without AI gets scripted.
 - **Relief:** A script that checks whether the server is running, the port is free, the health endpoint reports errors, and what is in the log is a classic harness building block. Optimized scripts make the agent better.
 - **Limit:** Domain judgment ("is this cut sensible?") stays with the model. And: where a tool already stands (browser control, computer use, `gh`), do not rebuild it as a script.
-- **Making it known:** The model does not "smell" a script. It must be mentioned – in `AGENTS.md` (one sentence), in the chat, or in a skill. Script vs. MCP: [mcp-und-werkzeuge.md](mcp-und-werkzeuge.md).
+- **Making it known:** The model does not "smell" a script. It must be mentioned – in `AGENTS.md` (one sentence), in the chat, or in a skill. Script vs. MCP: [mcp-and-tools.md](mcp-and-tools.md).
 
 ## Guiding image: a CLI tool is a function call to a human
 The caller is an LLM – you treat it like a smart colleague: it knows every technical term and needs no lecturing, but deserves the preparation that enables error-free work. The call is so simple that you can hardly get it wrong; the output so clear that the chance of a misunderstanding approaches zero. Inside, algorithms and data structures do the work; at the interface, human language is spoken – in both directions.
@@ -61,13 +61,13 @@ IMPORTANT: do NOT start the server directly with `npm start`. ALWAYS use `python
 ## Typical harness scripts
 | Script | Purpose |
 |---|---|
-| `tools/agent-start.py` (in the template) | start a coding agent without follow-up questions, optionally in tmux/psmux; `list`, `attach`, `send`, `kill`, `doctor` → [autonome-laeufe.md](autonome-laeufe.md) |
-| `tools/bootstrap.py` (in the template) | re-establish one-time setup that lives outside the repository and therefore does not survive a clone; idempotent, silent when nothing is missing, wired to a session hook where the agent has one → [agenten-kompatibilitaet.md](agenten-kompatibilitaet.md) |
-| `tools/sync-agents.py` (in the template) | translate subagent definitions from `.claude/agents/` into the format of other agents → [agenten-kompatibilitaet.md](agenten-kompatibilitaet.md) |
+| `tools/agent-start.py` (built by the skill) | start a coding agent without follow-up questions, optionally in tmux/psmux; `list`, `attach`, `send`, `kill`, `doctor` → [autonomous-runs.md](autonomous-runs.md) |
+| `tools/bootstrap.py` (built by the skill) | re-establish one-time setup that lives outside the repository and therefore does not survive a clone; idempotent, silent when nothing is missing, wired to a session hook where the agent has one → [agent-compatibility.md](agent-compatibility.md) |
+| `tools/sync-agents.py` (built by the skill) | translate subagent definitions from `.claude/agents/` into the format of other agents → [agent-compatibility.md](agent-compatibility.md) |
 | Server/service control | start with pre-check, status, logs with navigation, restart protection |
 | Log analysis | newest errors first, age, filters, a detail command for stack traces |
 | Test-runner wrapper | E2E in parallel, repeat failures sequentially, correlate browser/network/server log per test |
-| Usage script | quota in percent + time of the reset, so that an autonomous run stops before the limit → [autonome-laeufe.md](autonome-laeufe.md) |
+| Usage script | quota in percent + time of the reset, so that an autonomous run stops before the limit → [autonomous-runs.md](autonomous-runs.md) |
 | Monitoring | checks for hanging scripts and lost agents; called periodically by the agent via cron/loop |
 | Counting/measuring tools | words, lengths, dimensions – models count poorly |
 | Build/release | exactly one script for the release build, fixed in `AGENTS.md` as the only path |

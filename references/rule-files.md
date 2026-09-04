@@ -1,11 +1,11 @@
 # Rule files: AGENTS.md, CLAUDE.md, subfolders, rules
-**Core:** The rule file is read at every start – only what always applies belongs in it, plus the pitfalls that hurt. Everything task-specific is moved out and linked. (Context: harness template | As of: 2026-08-30)
+**Core:** The rule file is read at every start – only what always applies belongs in it, plus the pitfalls that hurt. Everything task-specific is moved out and linked. (Context: harness skill | As of: 2026-08-30)
 
 ## Two names, one file
-- `AGENTS.md` is the cross-agent standard; Claude Code reads `CLAUDE.md`. This template's solution: **`CLAUDE.md` contains exactly one line `@AGENTS.md`** (Claude Code's include syntax), all knowledge lives in `AGENTS.md`. Rule: in every folder where an `AGENTS.md` is created, a `CLAUDE.md` with `@AGENTS.md` is created next to it. In the context both appear as memory files; check with `/context` (Claude Code) or the agent's context command.
+- `AGENTS.md` is the cross-agent standard; Claude Code reads `CLAUDE.md`. The built harness's solution: **`CLAUDE.md` contains exactly one line `@AGENTS.md`** (Claude Code's include syntax), all knowledge lives in `AGENTS.md`. Rule: in every folder where an `AGENTS.md` is created, a `CLAUDE.md` with `@AGENTS.md` is created next to it. In the context both appear as memory files; check with `/context` (Claude Code) or the agent's context command.
 - File names in upper case (some agents accept lower case, best practice is upper case).
 - `CLAUDE.local.md` (or the agent's counterpart): read at the same moment but stays local with the developer (gitignored) – for personal preferences and machine-specific values (ports, paths).
-- Which agents read what and whether they can do includes: [agenten-kompatibilitaet.md](agenten-kompatibilitaet.md).
+- Which agents read what and whether they can do includes: [agent-compatibility.md](agent-compatibility.md).
 
 ## The four places
 | Place | Purpose | When read |
@@ -32,7 +32,7 @@ Situationally loaded rules land at the end of the chat – the position the mode
 - Situational details, coding-guideline catalogs, novels, long document lists – that belongs in linked documents, subfolder rule files, rules, or skills.
 - Outdated rules: they are dutifully followed and turn the file into dead weight. On any misbehavior, look into your own rule file first.
 - Secrets, machine-specific values (→ `CLAUDE.local.md`, environment variables).
-- Harness-internal state (which coding agents work here and what they support, sync duties, setup decisions, open points): it is needed only when someone works ON the harness, not with it → [MEMORY.md](MEMORY.md) of the harness skill.
+- Harness-internal state (which coding agents work here and what they support, sync duties, setup decisions, open points): it is needed only when someone works ON the harness, not with it → the project's `HARNESS.md`.
 
 Anthropic cut 90% of its own prompts in Claude Code because they no longer helped but constrained. Attitude: keep it small, prefer linking artifacts (even complex ones: test suite, diagram, documentation folder) – the agent finds the right thing in them itself.
 
@@ -40,16 +40,16 @@ Anthropic cut 90% of its own prompts in Claude Code because they no longer helpe
 - Second document: "If X comes up, read `docs/x.md`." The content lives only there.
 - Whole folder: "Before you start work in this project, check the `docs` folder for a document touching your topic, and read it." The reverse direction: store newly worked-out results there – **always state what should be stored and what not**, otherwise the agent stores the unusable.
 - Linking pattern instead of a custom subagent: the descriptions of all custom subagents sit permanently in the context (order of magnitude: a few thousand tokens). A three-liner "If you want to know X, start a subagent that reads `docs/x-expert.md` and follows the instructions" has the same effect without the standing cost. A custom subagent only when it is needed constantly or carries a lot of knowledge/a clear role (evaluator, librarian).
-- A skill instead of a rule file for knowledge that does not concern every run (coding guidelines, evolution knowledge of a system whose entry point is itself an agent) → [skills-und-commands.md](skills-und-commands.md).
+- A skill instead of a rule file for knowledge that does not concern every run (coding guidelines, evolution knowledge of a system whose entry point is itself an agent) → [skills-and-commands.md](skills-and-commands.md).
 
 ## Subfolder rule files (domain modules)
-- Prerequisite: a domain-cut folder tree (screaming architecture – from the outside you can see what it is about) and an agent that loads rule files in subfolders situationally (check in [agenten-kompatibilitaet.md](agenten-kompatibilitaet.md) – the snapshot there lists it for Claude Code and Codex, among others; verify during setup).
+- Prerequisite: a domain-cut folder tree (screaming architecture – from the outside you can see what it is about) and an agent that loads rule files in subfolders situationally (check in [agent-compatibility.md](agent-compatibility.md) – the snapshot there lists it for Claude Code and Codex, among others; verify during setup).
 - In: only what goes beyond normal use – module-specific pitfalls, conventions, interfaces. Not: what a service or repository is.
 - Here too: `AGENTS.md` + `CLAUDE.md` with `@AGENTS.md` side by side.
 
 ## rules files (path-bound rules)
 - What: prompt files whose validity is bound to file paths/patterns – they are loaded only when the agent touches a matching file. Example: styling rules only for test files, frontend conventions only for `src/ui/**`.
-- Where: Claude Code `.claude/rules/*.md` with frontmatter `paths:`; Cursor `.cursor/rules/*.mdc` with `globs`/`alwaysApply`; GitHub Copilot `.github/instructions/*.instructions.md` with `applyTo`. Other agents: [agenten-kompatibilitaet.md](agenten-kompatibilitaet.md).
+- Where: Claude Code `.claude/rules/*.md` with frontmatter `paths:`; Cursor `.cursor/rules/*.mdc` with `globs`/`alwaysApply`; GitHub Copilot `.github/instructions/*.instructions.md` with `applyTo`. Other agents: [agent-compatibility.md](agent-compatibility.md).
 - Rule of thumb: a rule that should only be read situationally belongs exactly there – not in the root rule file.
 
 ## Write for the AI, not for humans

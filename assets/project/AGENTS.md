@@ -1,14 +1,14 @@
 # AGENTS.md – Rules for coding agents in this project
 
-This project was created from the harness template (https://github.com/hwalde/harness-template). All project knowledge for agents lives here; `CLAUDE.md` contains only `@AGENTS.md`.
+This project's harness was built by the `harness` skill (https://github.com/hwalde/harness-skill). All project knowledge for agents lives here; `CLAUDE.md` contains only `@AGENTS.md`.
 
 ## Setting up the harness (delete this paragraph after setup)
 
-Suggest to the user that you set up this harness together with them. To do so, load the skill `harness` (if it cannot be loaded, read `.claude/skills/harness/SKILL.md`), read ALL documents cataloged there, and then follow `einrichtung.md`. As soon as setup is complete, delete this paragraph from AGENTS.md so the user is not offered the setup again.
+Suggest to the user that you set up this harness together with them. To do so, load the skill `harness` (if it cannot be loaded, it is not installed: `git clone https://github.com/hwalde/harness-skill <your agent's skill folder>/harness`, for Claude Code `~/.claude/skills/harness`, then load it), read ALL documents cataloged in its `references/index.md`, and then follow `references/setup.md`. As soon as setup is complete, delete this paragraph from AGENTS.md so the user is not offered the setup again.
 
 ## Harness knowledge
 
-If the user asks you anything about this harness or wants to improve or set it up, load the skill `harness`; if the skill cannot be loaded, read `.claude/skills/harness/SKILL.md` and the `index.md` linked there instead. Half-knowledge is dangerous: read the documents that touch your topic in full. The state of this harness (which coding agents work here, sync duties, decisions, deviations, open points) is not in this file but in `.claude/skills/harness/MEMORY.md` – this file is for working WITH the harness, that one for working ON it.
+If the user asks you anything about this harness or wants to improve, update or set it up, load the skill `harness`; if it cannot be loaded, it is not installed: `git clone https://github.com/hwalde/harness-skill ~/.claude/skills/harness` (Claude Code; other agents: their skill folder), then load it – do not work on the harness from memory. Half-knowledge is dangerous: read the skill's documents that touch your topic in full. The state of this harness (which coding agents work here, sync duties, decisions, deviations, open points, the skill version it was built with) is not in this file but in `HARNESS.md` next to it – this file is for working WITH the harness, that one for working ON it.
 
 ## Rule files
 
@@ -55,7 +55,7 @@ Be frugal with your context window. Delegate large reading, search, and research
 
 - `python3 tools/agent-start.py` – start, list, attach to, and kill coding agents for no-questions runs (tmux/psmux optional). Without arguments: help.
 - `python3 tools/bootstrap.py` – one-time local setup that does not survive a `git clone` (agent configuration living outside the repo). Idempotent and silent when nothing is missing. Run it once in a fresh checkout; agents with hooks can run it automatically.
-- New scripts for this harness are built following the principles in `.claude/skills/harness/skripte.md` and recorded here with one sentence each.
+- New scripts for this harness are built following the ten principles in the `harness` skill (`references/scripts.md`) and recorded here with one sentence each.
 <!-- During setup: MCP servers (e.g., Playwright for web apps, cua-computer-use for desktop apps) and the rule when they are ALWAYS to be used; further project-specific scripts. -->
 
 ## Architecture and coding guidelines

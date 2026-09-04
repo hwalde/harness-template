@@ -1,5 +1,5 @@
 # freilauf: letting agents run and monitoring them
-**Core:** This template is the project starter (what lives in the repo). freilauf is the superstructure above it: a self-hosted web interface that runs a standing team of coding agents on schedules and monitors them from outside. (Context: harness template | As of: 2026-08-30 | Source: https://github.com/hwalde/freilauf)
+**Core:** The harness this skill builds is the in-repo layer (rules, subagents, scripts, wiki). freilauf is the superstructure above it: a self-hosted web interface that runs a standing team of coding agents on schedules and monitors them from outside. (Context: harness skill | As of: 2026-08-30 | Source: https://github.com/hwalde/freilauf)
 
 ## What freilauf does
 - **Runs without supervision:** every run gets its own Git worktree and its own tmux session; runs do not disturb each other, you can attach at any time and read the whole screen.
@@ -10,20 +10,23 @@
 - **Reports** from the agent (`cc-report done|failed|help|progress|branch|pr`), **Telegram notifications**, **no-code flows** (what happens after a run: follow-up runs, messages to running agents, extraction from reports, branching).
 - **Coding agents and model providers as plugins:** Claude Code, opencode, hermes, cursor-agent, and others; more via plugin package. The interface in English, German, and Chinese.
 - **Skills for the agent that operates it:** freilauf ships user-level skills (`freilauf-agents`, `freilauf-runs`, `freilauf-flows`, `freilauf-repos`, `freilauf-models`, `freilauf-plugins`, `freilauf-stats`), so a coding agent can set the hub up and read it from the shell instead of the browser. `freilauf-agent-flow-builder` is the builder among them (see below).
-- Contains the start/attach scripts (`cc-start`, `cc-attach`, `cc-kill`, `cc-report`), of which `tools/agent-start.py` in this template is the project-local small edition.
+- Contains the start/attach scripts (`cc-start`, `cc-attach`, `cc-kill`, `cc-report`), of which `tools/agent-start.py` in the built harness is the project-local small edition.
+
+## Installing it – read the source, not this file
+freilauf changes faster than this document. Before you describe, recommend or install it, fetch its current README (<https://raw.githubusercontent.com/hwalde/freilauf/refs/heads/main/README.md>): features, prerequisites (as of this writing: Linux with systemd user units, Node.js 22+, tmux, git, jq, curl) and the shipped `freilauf-*` skills are listed there. It runs on **Linux only**; on macOS or Windows the local edition (`tools/agent-start.py` plus tmux/psmux) stays. If the user wants it installed, fetch <https://github.com/hwalde/freilauf/blob/main/SETUP_WITH_AGENT.md> – written for coding agents – and follow it to the end, including its verification steps; do not improvise from memory and do not write its secrets (tokens, VPN keys) into the project. Step F of `SKILL.md` is the procedure; this document supplies the concept and the traps below.
 
 ## When it pays off
 - As soon as runs are to happen regularly **unattended** or **on a schedule** (night runs, recurring maintenance, working through issues).
 - As soon as several agents or several repos run in parallel and you want to know when something went wrong – without constantly looking yourself.
 - As soon as the result of a run should land reliably on the main branch, with a check before the merge.
 
-## Interplay with this template
+## Interplay with the built harness
 | Level | Responsible |
 |---|---|
-| In the repo: rules (`AGENTS.md`), subagents (evaluator, librarian), skills, scripts, wiki | this template |
+| In the repo: rules (`AGENTS.md`), subagents (evaluator, librarian), skills, scripts, wiki | built by this skill into the repo |
 | Above the repo: starting on schedule, worktrees, monitoring, budget, merge, notification | freilauf |
 
-A project set up with this template runs in freilauf without further adaptation: the rules and subagents take hold in every run, the evaluator pass is the natural partner of the finish gate. Mind freilauf's security model (VPN as the access layer; the hub controls tmux, which is shell access).
+A project whose harness this skill built runs in freilauf without further adaptation: the rules and subagents take hold in every run, the evaluator pass is the natural partner of the finish gate. Mind freilauf's security model (VPN as the access layer; the hub controls tmux, which is shell access).
 
 Setup: `README` and `SETUP_WITH_AGENT.md` in the freilauf repository – the latter is written for coding agents ("Read SETUP_WITH_AGENT.md and set this up for me").
 

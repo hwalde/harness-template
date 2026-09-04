@@ -16,7 +16,7 @@ Ein Harness ist alles außer dem Sprachmodell: die Umgebung, in der der Agent l�
 
 - **Jedes Ergebnis wird von einem zweiten Augenpaar geprüft.** Der Subagent `evaluator` liest Spezifikation, Diff und Evidenz in frischem Kontext, ohne Schreibzugriff, und antwortet mit `PASS` oder `NEEDS_WORK`. Der Ersteller nimmt die eigene Arbeit nie selbst ab.
 - **Wissen überlebt die Sitzung.** Der `librarian` ist die einzige Tür zu einem LLM-Wiki im Repository: Entscheidungen samt Begründung, Fallstricke, Betriebswissen – gefiltert, damit der Kontext schlank bleibt.
-- **Läufe bleiben nie stecken.** Berechtigungsmodi für rückfragefreie Läufe, ein Start-Skript für tmux-/psmux-Sitzungen, Nutzungs-Tracking, Selbstüberwachung und die Regel „erst die Fragerunde, dann das Ziel".
+- **Läufe bleiben nie stecken.** Berechtigungsmodi für rückfragefreie Läufe, benannte Start- und Attach-Skripte je Agent und Betriebssystem (`claude-background-start`, `claude-attach`) für langlaufende Aufgaben in tmux-/psmux-Sitzungen, Nutzungs-Tracking, Selbstüberwachung und die Regel „erst die Fragerunde, dann das Ziel".
 - **Rote Linien stehen schriftlich fest.** Was der Agent lesen, ausführen und ohne Freigabe nie anfassen darf, steht in `AGENTS.md`, die Entscheidung dahinter in `HARNESS.md` – so bleibt ein unbeaufsichtigter Lauf in einem Unternehmensprojekt innerhalb des festgelegten Korridors.
 - **Er passt zu jedem Coding-Agenten.** Claude Code läuft out of the box; opencode wird generiert; Codex, Gemini CLI, Cursor, Copilot, hermes werden bei der Einrichtung angebunden, wenn der Agent untersucht, was jeder von ihnen aktuell unterstützt.
 
@@ -45,6 +45,8 @@ references/               Zwölf Dokumente – was ein Harness braucht, Regeldat
                           Skripte, autonome Läufe, Workflow, Agentenkompatibilität, freilauf, die Einrichtung
 assets/project/           Alles, was ein Projekt bekommt, am Zielpfad
 scripts/build.py          Baut (oder prüft) ein Projekt gegen die Vorlagen – idempotent, überschreibt nie
+scripts/make-start-scripts.py
+                          Benannte Start-/Attach-Skripte je Agent und Betriebssystem, für Projekte ohne Freilauf
 CHANGELOG.md              Was sich pro Version geändert hat, und was ein gebautes Projekt von Hand braucht
 ```
 

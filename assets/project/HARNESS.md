@@ -6,7 +6,7 @@ The documents of the `harness` skill describe how a harness works in general –
 ## Skill version
 _Which version of the `harness` skill built or last updated this harness (from `metadata.version` in its `SKILL.md`). Route E of the skill compares against it._
 
-- Built with harness skill 1.0.0 – setup not yet done.
+- Built with harness skill 1.1.0 – setup not yet done.
 
 ## Setup status
 _Which steps of the skill's `references/setup.md` are done, which were skipped, when._

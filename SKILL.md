@@ -49,6 +49,9 @@ freilauf branch; step Z closes every route that changed a file.
    Never both, never the wrong one – `AGENTS.md` is loaded on every request and must stay short.
 5. Never write into `assets/` or `references/` on behalf of a project; those are the skill.
    Project-specific knowledge belongs in the project (`AGENTS.md`, `HARNESS.md`, its wiki).
+6. **Whenever you create or edit a script** – for a project or for this skill – you need
+   `references/scripts.md` first: the ten binding principles, and the rule that shipped and
+   templated scripts are drafts you write, test for real and improve, never copy as they are.
 
 ## Step 1 – Classify the assignment and pick the route
 
@@ -88,8 +91,10 @@ switch to the change route when the first file is to be written.
    never write secrets into files. Steps the user skips go under "Open points" in `HARNESS.md`.
 5. If setup step 6 ends with freilauf wanted or installed, continue with step F right there.
    If freilauf is not used, setup step 6 item 7 offers the named start/attach scripts per
-   agent and OS (`scripts/make-start-scripts.py`) – explain their purpose and the difference
-   to freilauf first, generate, then test each one with a real run before recording it.
+   agent and OS – explain their purpose and the difference to freilauf first, then write
+   them yourself from the templates in `assets/start-scripts/` (its README has the
+   placeholders and the procedure), adapt them to the project, and test each one with a
+   real run before recording it.
 6. Step 10 of `references/setup.md` **is** step Z for this route – it already contains the
    evaluator pass, the `HARNESS.md` update, the sync commands, the librarian ingest and the
    commit. Do not run step Z a second time on top of it.
@@ -125,7 +130,7 @@ switch to the change route when the first file is to be written.
      confuses the agent more than none.
    - A coding agent added or its capabilities in doubt → `agent-compatibility.md`.
    - Permissions, no-questions runs, monitoring, named start/attach scripts per agent and OS
-     (`scripts/make-start-scripts.py`) → `autonomous-runs.md`; schedules, worktrees,
+     (templates in `assets/start-scripts/`) → `autonomous-runs.md`; schedules, worktrees,
      hub → `freilauf.md`; agents that fetch their own work, flows → step F; the standard
      workflow itself → `workflow.md`.
 2. Check `HARNESS.md` for a deviation or decision that touches this building block. If the
@@ -209,8 +214,10 @@ You are in the skill's checkout. Conventions, each with its reason:
 1. **Layout is the spec:** `SKILL.md` (frontmatter per agentskills.io: `name` = folder name,
    `description` ≤ 1024 chars, `metadata.version`), `references/` (documents, `index.md` is
    the catalog), `assets/project/` (everything a project receives, at its target path),
-   `scripts/build.py` and `scripts/make-start-scripts.py` (generators that write into a
-   project). No `AGENTS.md`/`CLAUDE.md` at the root – they would be loaded as rule
+   `scripts/build.py` (the one generator: it places the harness files), `assets/start-scripts/`
+   (script templates the agent writes project scripts from – deliberately no generator, a
+   script the agent wrote and ran is understood and fits the installed agent).
+   No `AGENTS.md`/`CLAUDE.md` at the root – they would be loaded as rule
    files while the skill is edited; `CLAUDE.md` is not even stored as a template but generated.
 2. **Templates and documents move together.** A changed subagent, script or `AGENTS.md`
    sentence in `assets/project/` needs the matching sentence in the reference that describes
@@ -224,9 +231,10 @@ You are in the skill's checkout. Conventions, each with its reason:
    `README.zh-CN.md`), which are maintained **together** – a change to one is a change to all.
 5. **Test the build:** `python3 scripts/build.py <scratch dir>` into an empty temporary
    directory, then `python3 tools/sync-agents.py` and `python3 tools/agent-start.py doctor`
-   there; `build.py --check` must report a clean match. A changed script template or
-   generator is tested with a **real** run (start an installed agent through it, attach,
-   end it) – a dry run did not catch the trust dialog that hung the first real one. Validate the frontmatter if
+   there; `build.py --check` must report a clean match. A changed script template is
+   tested with a **real** run: write a script from it as the procedure says, start an
+   installed agent through it, attach, end it – a dry run did not catch the trust dialog
+   that hung the first real one. Validate the frontmatter if
    `skills-ref` is installed (`skills-ref validate .`). Then step Z (evaluator, commit).
 
 ## Step Z – Closing sequence for every change

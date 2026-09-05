@@ -18,7 +18,7 @@ compatibility: >-
   Copilot and hermes. Needs git and python3. freilauf (optional) runs on Linux only.
 metadata:
   author: Herbert Walde
-  version: "1.2.0"
+  version: "1.2.1"
   homepage: https://github.com/hwalde/harness-skill
 ---
 
@@ -247,10 +247,13 @@ You are in the skill's checkout. Conventions, each with its reason:
    sentence in `assets/project/` needs the matching sentence in the reference that describes
    it, and the reverse. `HARNESS.md` in `assets/project/` is the empty state file; keep its
    section names – route E and the setup refer to them.
-3. **Every change is a version.** Add a `CHANGELOG.md` entry (Keep a Changelog: Added,
-   Changed, Fixed, and a "Migration" line when a project's built files need a hand), bump
+3. **Every change is a version.** Add a `CHANGELOG.md` entry — day-based (one section per
+   day, ISO date, newest first), Keep a Changelog categories (Added, Changed, Fixed, and a
+   "Migration" line when a project's built files need a hand), in the same commit as the
+   change; the maintenance rule lives in the `AGENTS.md` of the mother project
+   (`hwalde/harness-skill-harness`, private, carries this repository as a submodule). Bump
    `metadata.version` (semver: templates or procedure changed incompatibly → major; new
-   building block or document → minor; wording → patch).
+   building block or document → minor; wording → patch) and name that version in the entry.
 4. **Language:** everything English except the three READMEs (`README.md`, `README.de.md`,
    `README.zh-CN.md`), which are maintained **together** – a change to one is a change to all.
 5. **Test the build:** `python3 scripts/build.py <scratch dir>` into an empty temporary
